@@ -1,0 +1,876 @@
+:root {
+  --sidebar-width: 13rem;
+
+  /* Neutral */
+  --gray-50:  #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-700: #374151;
+
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f9fafb;
+
+  --text: #111827;
+  --muted: #6b7280;
+
+  /* Radius / Effects */
+  --focus-ring: 0 0 0 3px rgb(from var(--primary-color) r g b / 0.2);
+
+  --white-color: #ffffff;
+  --primary-color: #0ea5e9;
+  --secondary-color: #6b7280;
+  --success-color: #059669;
+  --danger-color: #ef4444;
+  --warning-color: #f59e0b;
+  --light-color: #f9fafb;
+  --dark-color: #111827;
+
+  --primary-hover-color: #0284c7;
+  --secondary-hover-color: #4b5563;
+  --success-hover-color: #047857;
+  --danger-hover-color: #dc2626;
+  --warning-hover-color: #d97706;
+  --light-hover-color: #f3f4f6;
+  --dark-hover-color: #020617;
+
+  --primary-active-color: #0369a1;
+  --secondary-active-color: #374151;
+  --success-active-color: #065f46;
+  --danger-active-color: #b91c1c;
+  --warning-active-color: #b45309;
+  --light-active-color: #e5e7eb;
+  --dark-active-color: #000000;
+}
+
+/* =========================================================
+   2. Base
+   ========================================================= */
+body {
+  color: var(--text);
+  background-color: #f3f4f6;
+}
+
+.text-muted {
+  color: var(--muted) !important;
+}
+
+/* =========================================================
+   3. AppButton – Unified Behavior
+   ========================================================= */
+.app-button {
+  font-weight: 700;
+  padding: 10px 16px;
+  line-height: 1.2;
+
+  /* Kill Bootstrap states */
+  --bs-btn-hover-bg: initial;
+  --bs-btn-hover-color: initial;
+  --bs-btn-hover-border-color: initial;
+  --bs-btn-active-bg: initial;
+  --bs-btn-active-border-color: initial;
+  --bs-btn-focus-border-color: initial;
+  --bs-btn-focus-shadow-rgb: 16,185,129;
+
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease,
+    color 0.12s ease;
+}
+
+/* Hover = invert */
+.app-button:hover {
+  /* background-color: var(--white-color) !important; */
+  border-color: inherit !important;
+}
+
+/* Active */
+.app-button:active {
+  color: var(--white-color) !important;
+}
+
+/* Focus (mouse) */
+.app-button:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Focus-visible (keyboard) */
+.app-button:focus-visible {
+  outline: none !important;
+  box-shadow: var(--focus-ring) !important;
+}
+
+/* Disabled */
+.app-button.disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* =========================================================
+   3-1. Button Variants
+   ========================================================= */
+
+/* ---------- Primary ---------- */
+.app-button-primary,
+.app-button-primary:disabled {
+  background-color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  color: var(--white-color) !important;
+}
+
+.app-button-primary:hover,
+.app-button-primary:focus-visible {
+  background-color: var(--primary-hover-color) !important;
+  border: 1px solid var(--primary-hover-color) !important;
+  color: var(--white-color) !important;
+  --bs-btn-hover-bg: var(--primary-hover-color) !important;
+}
+
+.app-button-primary:active {
+  background-color: var(--primary-active-color) !important;
+  border-color: var(--primary-active-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-primary-outline,
+.app-button-primary-outline:disabled {
+  background-color: var(--white-color) !important;
+  border: 1px solid var(--primary-color) !important;
+  color: var(--primary-color) !important;
+}
+
+.app-button-primary-outline:hover,
+.app-button-primary-outline:focus-visible {
+  background-color: var(--primary-hover-color) !important;
+  border: 1px solid var(--primary-hover-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-primary-outline:active {
+  background-color: var(--primary-active-color) !important;
+  border-color: var(--primary-active-color) !important;
+}
+
+/* ---------- Secondary ---------- */
+.app-button-secondary,
+.app-button-secondary:disabled {
+  background-color: var(--secondary-color);
+  border: 1px solid var(--secondary-color);
+  color: var(--white-color) !important;
+}
+
+.app-button-secondary:hover,
+.app-button-secondary:focus-visible {
+  background-color: var(--secondary-hover-color) !important;
+  border: 1px solid var(--secondary-hover-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-secondary:active {
+  background-color: var(--secondary-active-color) !important;
+  border-color: var(--secondary-active-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-secondary-outline,
+.app-button-secondary-outline:disabled {
+  background-color: var(--white-color) !important;
+  border: 1px solid var(--secondary-color) !important;
+  color: var(--secondary-color) !important;
+}
+
+.app-button-secondary-outline:hover,
+.app-button-secondary-outline:focus-visible {
+  background-color: var(--secondary-hover-color) !important;
+  border: 1px solid var(--secondary-hover-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-secondary-outline:active {
+  background-color: var(--secondary-active-color) !important;
+  border-color: var(--secondary-active-color) !important;
+}
+
+/* ---------- Success ---------- */
+.app-button-success,
+.app-button-success:disabled {
+  background-color: var(--success-color);
+  border: 1px solid var(--success-color);
+  color: var(--white-color) !important;
+}
+
+.app-button-success:hover,
+.app-button-success:focus-visible {
+  background-color: var(--success-hover-color) !important;
+  border: 1px solid var(--success-hover-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-success:active {
+  background-color: var(--success-active-color) !important;
+  border-color: var(--success-active-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-success-outline,
+.app-button-success-outline:disabled {
+  background-color: var(--white-color) !important;
+  border: 1px solid var(--success-color) !important;
+  color: var(--success-color) !important;
+}
+
+.app-button-success-outline:hover,
+.app-button-success-outline:focus-visible {
+  background-color: var(--success-hover-color) !important;
+  border: 1px solid var(--success-hover-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-success-outline:active {
+  background-color: var(--success-active-color) !important;
+  border-color: var(--success-active-color) !important;
+}
+
+/* ---------- Danger ---------- */
+.app-button-danger,
+.app-button-danger:disabled {
+  background-color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+  color: var(--white-color) !important;
+}
+
+.app-button-danger:hover,
+.app-button-danger:focus-visible {
+  background-color: var(--danger-hover-color) !important;
+  border: 1px solid var(--danger-hover-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-danger:active {
+  background-color: var(--danger-active-color) !important;
+  border-color: var(--danger-active-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-danger-outline,
+.app-button-danger-outline:disabled {
+  background-color: var(--white-color) !important;
+  border: 1px solid var(--danger-color) !important;
+  color: var(--danger-color) !important;
+}
+
+.app-button-danger-outline:hover,
+.app-button-danger-outline:focus-visible {
+  background-color: var(--danger-hover-color) !important;
+  border: 1px solid var(--danger-hover-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-danger-outline:active {
+  background-color: var(--danger-active-color) !important;
+  border-color: var(--danger-active-color) !important;
+}
+
+/* ---------- Warning ---------- */
+.app-button-warning,
+.app-button-warning:disabled {
+  background-color: var(--warning-color);
+  border: 1px solid var(--warning-color);
+  color: var(--white-color) !important;
+}
+
+.app-button-warning:hover,
+.app-button-warning:focus-visible {
+  background-color: var(--warning-hover-color) !important;
+  border: 1px solid var(--warning-hover-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-warning:active {
+  background-color: var(--warning-active-color) !important;
+  border-color: var(--warning-active-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-warning-outline,
+.app-button-warning-outline:disabled {
+  background-color: var(--white-color) !important;
+  border: 1px solid var(--warning-color) !important;
+  color: var(--warning-color) !important;
+}
+
+.app-button-warning-outline:hover,
+.app-button-warning-outline:focus-visible {
+  background-color: var(--warning-hover-color) !important;
+  border-color: var(--warning-hover-color) !important;
+  color: var(--white-color) !important;
+}
+
+.app-button-warning-outline:active {
+  background-color: var(--warning-active-color) !important;
+  border-color: var(--warning-active-color) !important;
+}
+
+
+/* ---------- Light ---------- */
+.app-button-light,
+.app-button-light:disabled {
+  background-color: var(--light-color);
+  border: 1px solid var(--light-color);
+  color: var(--dark-color) !important;
+}
+
+.app-button-light:hover,
+.app-button-light:focus-visible {
+  background-color: var(--light-hover-color) !important;
+  border: 1px solid var(--light-hover-color) !important;
+  color: var(--dark-hover-color) !important;
+}
+
+.app-button-light:active {
+  background-color: var(--light-active-color) !important;
+  border-color: var(--light-active-color) !important;
+  color: var(--dark-active-color) !important;
+}
+
+.app-button-light-outline,
+.app-button-light-outline:disabled {
+  background-color: var(--light-color) !important;
+  border: 1px solid var(--light-color) !important;
+  color: var(--dark-color) !important;
+}
+
+.app-button-light-outline:hover,
+.app-button-light-outline:focus-visible {
+  background-color: var(--light-hover-color) !important;
+  border-color: var(--light-hover-color) !important;
+  color: var(--dark-hover-color) !important;
+}
+
+.app-button-light-outline:active {
+  background-color: var(--light-active-color) !important;
+  border-color: var(--light-active-color) !important;
+  color: var(--dark-active-color) !important;
+}
+
+/* ---------- None ---------- */
+.app-button-none,
+.app-button-none:disabled {
+  text-align: start;
+  font-weight: normal;
+  background-color: var(--white-color);
+  border: 1px solid rgb(from var(--white-color) r g b / 0);
+  color: var(--primary-color) !important;
+  padding: 12px 14px !important;
+}
+
+.app-button-none:hover,
+.app-button-none:focus-visible {
+  background-color: var(--light-color) !important;
+  border: 1px solid rgb(from var(--white-color) r g b / 0) !important;
+  color: var(--primary-hover-color) !important;
+}
+
+.app-button-none:active {
+  background-color: var(--light-active-color) !important;
+  border-color: rgb(from var(--white-color) r g b / 0) !important;
+  color: var(--primary-active-color) !important;
+}
+
+/* ---------- None ---------- */
+.app-button-none-outline,
+.app-button-none-outline:disabled {
+  text-align: start;
+  font-weight: normal;
+  background-color: var(--white-color);
+  border: 1px solid var(--gray-300);
+  color: var(--primary-color) !important;
+  padding: 12px 14px !important;
+}
+
+.app-button-none-outline:hover,
+.app-button-none-outline:focus-visible {
+  background-color: var(--white-color) !important;
+  border: 1px solid var(--gray-300) !important;
+  color: var(--primary-hover-color) !important;
+}
+
+.app-button-none-outline:active {
+  background-color: var(--white-color) !important;
+  border-color: var(--primary-active-color) !important;
+  color: var(--primary-active-color) !important;
+  box-shadow: var(--focus-ring) !important;
+}
+
+
+/* =========================================================
+   AppCard
+   ========================================================= */
+.app-card {
+  background: var(--surface);
+  border: 1px solid var(--gray-200);
+}
+
+/* =========================================================
+   AppInput / AppSelect
+   ========================================================= */
+.app-input,
+.app-select {
+  padding: 12px 14px;
+  border: 1px solid var(--gray-300);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app-input::placeholder {
+  color: #9ca3af;
+}
+
+.app-input:focus,
+.app-input:focus-visible,
+.app-select:focus,
+.app-select:focus-visible {
+  border-color: var(--primary-color);
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+/* =========================================================
+   AppBadge
+   ========================================================= */
+.app-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.app-badge-primary {
+  background: rgb(from var(--primary-color) r g b / 0.2);
+}
+.app-badge-secondary {
+  background: rgb(from var(--secondary-color) r g b / 0.2);
+}
+.app-badge-success {
+  background: rgb(from var(--success-color) r g b / 0.2);
+}
+.app-badge-danger {
+  background: rgb(from var(--danger-color) r g b / 0.2);
+}
+.app-badge-warning {
+  background: rgb(from var(--warning-color) r g b / 0.2);
+}
+.app-badge-light {
+  background: rgb(from var(--light-color) r g b / 0.2);
+}
+
+.badge-delete-btn {
+  color: var(--red-700);
+}
+
+/* =========================================================
+   Alert
+   ========================================================= */
+.alert-primary {
+  background: rgb(from var(--primary-color) r g b / 0.2);
+  border: 1px solid var(--primary-color);
+}
+.alert-secondary {
+  background: rgb(from var(--secondary-color) r g b / 0.2);
+  border: 1px solid var(--secondary-color);
+}
+.alert-success {
+  background: rgb(from var(--success-color) r g b / 0.2);
+  border: 1px solid var(--success-color);
+}
+.alert-danger {
+  background: rgb(from var(--danger-color) r g b / 0.2);
+  border: 1px solid var(--danger-color);
+}
+.alert-warning {
+  background: rgb(from var(--warning-color) r g b / 0.2);
+  border: 1px solid var(--warning-color);
+}
+.alert-light {
+  background: rgb(from var(--light-color) r g b / 0.2);
+  border: 1px solid var(--light-color);
+}
+
+/* =========================================================
+   AppModal
+   ========================================================= */
+.app-modal {
+  background: var(--surface);
+  border: 1px solid var(--gray-200);
+}
+
+@media (max-width: 576px) {
+  .app-modal {
+    border: none;
+  }
+}
+
+.modal-scroll {
+  max-height: 22rem !important;
+  overflow-y: scroll;
+  /* IE, Edge 対応 */
+  -ms-overflow-style: none !important;
+  /* Firefox 対応 */
+  scrollbar-width: none !important;
+}
+/* Chrome, Safari 対応 */
+.modal-scroll::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* =========================================================
+   App Toggle Button (Button-like ON / OFF)
+   ========================================================= */
+
+.form-check-input {
+  background-color: initial;
+  border: 1px solid var(--gray-300);
+  transform: scale(1.25);
+}
+
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+.form-check-input:focus {
+  outline: 0;
+  box-shadow: 0 0 0 .25rem rgb(from var(--primary-color) r g b / 0.1);
+  border-color: var(--primary-color);
+}
+
+/* =========================================================
+   SelectItemModal
+   ========================================================= */
+.select-item-modal {
+
+}
+
+.select-item-modal .item-row {
+  padding: 16px 14px;
+  border-bottom: 1px solid var(--gray-200);
+  cursor: pointer;
+}
+
+.item-selected-icon {
+  color: var(--primary-color);
+  transform: scale(1.5);
+}
+
+@media (max-width: 575px) {
+  .select-item-modal .modal-scroll {
+    height: initial !important;
+    max-height: initial !important;
+  }
+}
+
+/* =========================================================
+   SkillPicker helpers
+   ========================================================= */
+.skill-candidate {
+  padding: 10px 12px;
+  border-radius: var(--bs-border-radius);
+  background: var(--surface-2);
+  border: 1px solid var(--gray-200);
+  cursor: pointer;
+}
+
+.skill-candidate:hover {
+  background: rgb(from var(--primary-color) r g b / 0.1);
+
+}
+
+.skill-mobile-item {
+  padding: 16px 14px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.skill-mobile-item:active {
+  background: rgba(16,185,129,0.12);
+}
+
+/* =========================================================
+   Layout
+   ========================================================= */
+
+.app-layout {
+  display: flex;
+}
+
+.app-main {
+  flex: 1;
+  padding: 1rem;
+}
+@media (min-width: 1400px) {
+  .app-main {
+    margin-left: var(--sidebar-width);
+  }
+}
+
+/* =========================================================
+   Header (mobile)
+   ========================================================= */
+
+.app-header {
+  display: none;
+  height: 56px;
+  padding: 0 16px;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--gray-200);
+  background: #ffffff;
+}
+
+/* =========================================================
+   Sidebar (PC)
+   ========================================================= */
+
+.app-sidebar {
+  position: fixed;
+  height: 100%;
+  width: var(--sidebar-width);
+  top: 0;
+  left: 0;
+  background: #ffffff;
+  border-right: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.app-sidebar-header {
+  height: 64px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--green-600);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.app-sidebar-nav {
+  padding: 0.5rem;
+  flex: 1;
+  width: 100%;
+}
+
+.app-sidebar-footer {
+  width: 100%;
+  padding: 0 20px;
+  border-top: 1px solid var(--gray-200);
+}
+
+/* Item */
+.sidebar-item {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+  border-radius: var(--bs-border-radius);
+  color: var(--gray-700);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+}
+
+.sidebar-item:hover {
+  background: rgb(from var(--primary-color) r g b / 0.1);
+  color: var(--green-600);
+}
+
+.sidebar-item.active {
+  background: rgb(from var(--primary-color) r g b / 0.2);
+  color: var(--green-700);
+}
+
+.sidebar-item.muted {
+  color: var(--muted);
+}
+
+.sidebar-item.muted:hover {
+  background: var(--gray-100);
+  color: var(--gray-700);
+}
+
+.sidebar-item.bound-line::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  border-top: 1px solid var(--gray-200);
+  width: 90%;
+}
+
+/* =========================================================
+   Sidebar Drawer (Mobile)
+   ========================================================= */
+
+@media (max-width: 1399px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .app-header {
+    display: flex;
+  }
+
+  .app-sidebar {
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .app-sidebar-header {
+    display: none;
+  }
+
+  .app-main {
+    padding: 16px;
+  }
+}
+
+/* Overlay */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 90;
+}
+
+/* =========================================================
+   Hamburger Button (CSS only)
+   ========================================================= */
+
+.hamburger {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+/* 3 lines */
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--gray-700);
+  border-radius: var(--bs-border-radius);
+  transition:
+    background-color 0.15s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+/* hover */
+.hamburger:hover {
+  background: rgba(16,185,129,0.08);
+}
+
+.hamburger:hover span {
+  background: var(--green-600);
+}
+
+/* focus-visible（アクセシビリティ） */
+.hamburger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.35);
+}
+
+/* PCでは非表示 */
+@media (min-width: 1400px) {
+  .hamburger {
+    display: none;
+  }
+}
+
+/* =========================================================
+   Sidebar Close Button (CSS only)
+   ========================================================= */
+
+.app-sidebar-mobile-header {
+  height: 64px;
+  width: 100%;
+  /* border-bottom: 1px solid var(--gray-200); */
+}
+
+.sidebar-close {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* × を描画 */
+.sidebar-close::before,
+.sidebar-close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 2px;
+  background: var(--gray-500, #6b7280);
+  transform-origin: center;
+}
+
+.sidebar-close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.sidebar-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* hover */
+.sidebar-close:hover {
+  background: rgba(16,185,129,0.1);
+}
+
+.sidebar-close:hover::before,
+.sidebar-close:hover::after {
+  background: var(--green-600);
+}
+
+/* focus-visible（アクセシビリティ） */
+.sidebar-close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.35);
+}
+
+/* PCでは非表示 */
+@media (min-width: 1400px) {
+  .sidebar-close,
+  .app-sidebar-mobile-header {
+    display: none;
+  }
+}
+
+.table tbody tr {
+  vertical-align: middle;
+}

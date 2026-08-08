@@ -1,36 +1,293 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 機能要件書 — skill-sheet-app
 
-## Getting Started
+---
 
-First, run the development server:
+## 1. システム概要
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+IT エンジニアのスキルシートを会社単位で管理・出力・共有するための Web アプリケーション。
+各エンジニアが担当案件と使用技術を登録し、PDF 形式のスキルシートとして社外共有できる。
+
+---
+
+## 2. 技術スタック
+
+| 区分 | 技術 |
+|------|------|
+| フレームワーク | Next.js 16 (App Router) |
+| 言語 | TypeScript |
+| DB | SQLite（Prisma 6） |
+| UI | React Bootstrap 5 |
+| 認証 | Cookie セッション（jose）+ bcrypt |
+| PDF | @react-pdf/renderer |
+| バリデーション | Zod |
+
+---
+
+## 3. ロール定義
+
+| ロール | 説明 |
+|--------|------|
+| OWNER | 管理者（最上位権限） |
+| ADMIN | マネージャー（ユーザ管理・共有リンク管理が可能） |
+| MEMBER | 一般ユーザ（自分のスキルシートのみ操作可能） |
+
+---
+
+## 4. マルチテナント構造
+
+- **Company（会社）** を最上位エンティティとし、全データは `companyId` で分離する。
+- ユーザ・スキルシート・案件・スキルマスタ・認証トークン・共有リンクはすべて会社に紐付く。
+
+---
+
+## 5. 機能一覧
+
+### 5.1 認証
+
+#### 5.1.1 ログイン
+- メールアドレス・パスワードで認証する。
+- 認証成功時、Cookie `ss_session` にセッションを保存する。
+- 失敗時はエラーメッセージを表示する。
+
+#### 5.1.2 ログアウト
+- Cookie `ss_session` を削除し、ログインページへリダイレクトする。
+
+#### 5.1.3 ルートガード（ミドルウェア）
+- 下記パスはログイン必須とし、未認証の場合 `/login` へリダイレクトする。
+  - `/dashboard/*`
+  - `/projects/*`
+  - `/pdf/*`
+  - `/admin/*`
+- `/login`、`/api/auth/*` はガードの対象外。
+- 公開エンドポイント（`/invite/*`、`/share/*`、`/api/public/*`）はガード対象外。
+
+---
+
+### 5.2 招待フロー（ユーザ登録）
+
+1. 管理者が **ユーザ作成**（メールアドレス・名前・ロール）を実行する。
+2. システムが招待トークン（有効期限 72 時間）を生成し、招待 URL を発行する。
+3. 管理者が招待 URL をユーザに通知する（コピー共有）。
+4. ユーザが招待 URL にアクセスし、パスワードを設定して登録を完了する。
+   - トークンは使用済みフラグ（`usedAt`）・有効期限（`expiresAt`）・`passwordHash` 未設定を検証する。
+   - 一度使用したトークンは無効になる。
+   - 招待リンク再発行時は、同ユーザの未使用トークンをすべて無効化してから新規発行する。
+
+---
+
+### 5.3 ダッシュボード（`/dashboard`）
+
+全ロール共通で参照できるトップ画面。
+
+| 要素 | 内容 |
+|------|------|
+| スキルシート出力バナー | 案件が登録済みであれば PDF 出力ボタンを表示、未登録の場合は案件登録を促す |
+| 案件一覧カード | 登録案件数・案件一覧へのリンク |
+| 管理者メニューカード | OWNER / ADMIN のみ表示。登録ユーザ数・共有リンク管理・ユーザ管理へのリンク |
+| 得意スキルカード | カテゴリ別スキルランキング（自分 / 会社全体） |
+
+#### 得意スキルランキング仕様
+- カテゴリ：言語 / フレームワーク / データベース / クラウド・インフラ / ツール
+- スコア算出：各案件の期間（月）をカテゴリ内スキル数で均等配分して合算
+  - 終了日が未設定（進行中）の場合は現在月を終了月として計算する
+- 会社全体ランキング：`カバレッジ × log(1 + 利用人数)` で正規化
+- 上位 5 件を表示
+- 表示項目：累計期間（例: 2年3ヶ月）・比率（%）・利用人数（会社全体のみ）
+
+---
+
+### 5.4 案件管理（`/projects`）
+
+#### 5.4.1 案件一覧
+- ログインユーザ自身の案件を一覧表示する。
+- 並び順：開始日降順 → 登録日降順。
+
+#### 5.4.2 案件登録（`/projects/new`）
+- 以下の入力項目を持つ。
+
+| 項目 | 種別 | 説明 |
+|------|------|------|
+| 案件名 | テキスト | 必須 |
+| 開始日 | 年月セレクト | 必須 |
+| 終了日 | 年月セレクト | 任意（空欄 = 現在進行中） |
+| 役割 | セレクト | Webデザイナー / アプリケーション / フロントエンド / サーバーサイド / フロントエンド&サーバーサイド / PL / PM |
+| 担当工程 | 複数選択モーダル | 要件定義 / 基本設計 / 詳細設計 / 実装 / テスト / 運用・保守 |
+| 内容 | テキストエリア | 任意 |
+| 使用技術 | カテゴリ別複数選択 | 言語 / フレームワーク / データベース / クラウド・インフラ / ツール |
+
+- 開始日 > 終了日 の場合はバリデーションエラー。
+- 保存後、案件一覧へ遷移する。
+
+#### 5.4.3 案件編集（`/projects/[projectId]`）
+- 登録と同じフォームで既存データを編集する。
+- **自分が所有する案件のみ編集可能**（他ユーザの案件は `skillSheet.userId` で検証）。
+
+#### 5.4.4 案件削除
+- 編集画面から削除ボタンを実行する。
+- **自分が所有する案件のみ削除可能**（他ユーザの案件は `skillSheet.userId` で検証）。
+- 削除後、案件一覧へ遷移する。
+
+---
+
+### 5.5 スキルマスタ
+
+- 会社ごとにスキルマスタ（SkillMaster）を保持する。
+- カテゴリ：`LANGUAGE` / `FRAMEWORK` / `DATABASE` / `CLOUD` / `TOOL`
+- マスタに存在するスキルを案件登録時のピッカーに表示する。
+- `isActive` フラグで有効 / 無効を切り替えられる。
+- ユーザが自由入力でスキルを追加できる（ピッカー内の入力フォームから）。
+
+---
+
+### 5.6 PDF 出力
+
+#### 5.6.1 自分のスキルシート出力（`/pdf/skill-sheet/output`）
+- ログイン中のユーザのスキルシートを PDF で出力する。
+- ブラウザの新規タブで直接 PDF が開く。
+- 未認証の場合は `/login` へリダイレクトされる。
+
+#### 5.6.2 特定ユーザのスキルシート出力（`/pdf/skill-sheet/[userId]`、管理者向け）
+- 指定ユーザ（同一会社内）のスキルシートを管理者が出力する。
+
+#### 5.6.3 PDF レイアウト
+- A4 縦サイズ。
+- ヘッダ：「スキルシート」タイトル、会社名、氏名（`subName` 優先）、年齢（生年月日から自動計算）。
+- テーブル：各案件を1行で表示。
+
+  | 列 | 内容 |
+  |----|------|
+  | # | 番号 |
+  | 期間 | 開始〜終了（現在進行中は「現在」） |
+  | プロジェクト名 | 案件名 |
+  | 役割 | 担当役割 |
+  | インフラ / DB | クラウド・インフラ + データベース |
+  | 言語 / FW | 言語 + フレームワーク |
+  | ツール | ツール |
+  | 工程（6列） | 担当工程を「○」で表示 |
+
+- ウォーターマーク：「社外秘」を斜め方向に薄く表示。
+- フォント：NotoSansJP（日本語対応）。
+- 案件の並び順：開始日昇順 → 登録日昇順。
+
+---
+
+### 5.7 共有リンク管理（管理者）（`/admin/shareLink`）
+
+#### 5.7.1 共有リンク作成
+- 対象ユーザ（案件が1件以上登録された有効ユーザ）を選択して共有リンクを発行する。
+- 任意で有効期限（最長1ヶ月）・コメントを設定できる。
+- トークンは推測困難なランダム文字列を生成する。
+- 発行後、リンク URL をモーダル内でコピーできる。
+
+#### 5.7.2 共有リンク一覧
+
+- 会社内の全共有リンクを一覧表示する（対象ユーザ、有効期限、作成日、メモ）。
+
+#### 5.7.3 共有リンク削除
+- 個別削除（ID 指定）。
+- 期限切れリンクの一括削除。
+
+#### 5.7.4 共有リンク経由の PDF 参照（`/share/[token]`）
+- 認証不要の公開エンドポイント。
+- トークンが有効（存在 + 期限内）であればスキルシート PDF をレスポンスとして返す。
+- 無効・期限切れの場合は 404 を返す。
+- ファイル名：`スキルシート_{ユーザ名}.pdf`（Content-Disposition: inline）。
+
+---
+
+### 5.8 ユーザ管理（管理者）（`/admin/users`）
+
+#### 5.8.1 ユーザ一覧
+- 会社内の全ユーザを一覧表示する（名前、メールアドレス、ロール、有効フラグ、招待状態、登録案件数）。
+
+#### 5.8.2 ユーザ作成（`/admin/users/new`）
+- 入力項目：メールアドレス・名前・ロール。
+- 作成後、即座に招待リンクモーダルを表示する（5.2 節の招待フローへ接続）。
+
+#### 5.8.3 ユーザ編集（`/admin/users/[id]`）
+- 変更可能項目：名前・表示名（subName）・生年月日・ロール・有効 / 無効フラグ。
+- 招待未完了（パスワード未設定）ユーザは有効フラグの変更不可。
+- 招待リンク再発行ボタン（既存の未使用招待トークンをすべて無効化してから新規生成して再発行）。
+- 表示名はスキルシートの氏名欄に使用。
+- 生年月日はスキルシートの年齢計算に使用。
+
+---
+
+## 6. データモデル概要
+
+```
+Company
+  ├── User (1:N)
+  │     ├── SkillSheet (1:1)
+  │     │     └── SkillProject (1:N)
+  │     ├── AuthToken (1:N)  ← 招待トークン
+  │     └── SharedLinkUrl (1:N)  ← 共有リンク
+  └── SkillMaster (1:N)  ← 会社独自スキルマスタ
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 主要フィールド
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**SkillProject**
+- `projectJson`: `{ description, role, phases[] }` を JSON で保存
+- `skillsJson`: `{ languages[], frameworks[], databases[], cloud[], tools[] }` を JSON で保存
+- `sortOrder`: 表示順
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**SharedLinkUrl**
+- `type = "SKILLSHEET"` 固定
+- `expiresAt`: 期限なし（null）または日付文字列（YYYY-MM-DD）
 
-## Learn More
+**AuthToken**
+- `type = "INVITE"` 固定
+- `usedAt`: 使用日時（null = 未使用）
+- `tokenHash`: SHA-256 ハッシュで保存
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 7. API エンドポイント一覧
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| メソッド | パス | 説明 | 必要ロール |
+|---------|------|------|-----------|
+| POST | `/api/auth/login` | ログイン | 不要 |
+| POST | `/api/auth/logout` | ログアウト | 要認証 |
+| GET | `/api/skill-sheet` | スキルシート取得 | 要認証 |
+| GET / POST / PUT | `/api/projects` | 案件 取得・新規・更新 | 要認証（自分の案件のみ） |
+| DELETE | `/api/projects/[projectId]` | 案件削除 | 要認証（自分の案件のみ） |
+| GET | `/api/admin/users` | ユーザ一覧 | ADMIN以上 |
+| POST | `/api/admin/users` | ユーザ作成 | ADMIN以上 |
+| PATCH | `/api/admin/users/[id]` | ユーザ更新 | ADMIN以上 |
+| POST | `/api/admin/users/[id]/invite` | 招待リンク再発行 | ADMIN以上 |
+| POST / DELETE | `/api/admin/shareLink` | 共有リンク作成・削除 | ADMIN以上 |
+| POST | `/api/public/register-company` | 会社登録（開発用） | 不要 |
+| POST | `/api/public/invite/complete` | 招待完了（パスワード設定） | 不要 |
+| GET | `/share/[token]` | 共有リンク経由 PDF 参照 | 不要（公開） |
+| GET | `/pdf/skill-sheet/output` | 自分の PDF 出力 | 要認証 |
+| GET | `/pdf/skill-sheet/[userId]` | 指定ユーザの PDF 出力 | ADMIN以上 |
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 8. アクセス制御まとめ
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| 機能 | MEMBER | ADMIN | OWNER |
+|------|:------:|:-----:|:-----:|
+| 自分の案件 CRUD | ○ | ○ | ○ |
+| 自分のスキルシート PDF 出力 | ○ | ○ | ○ |
+| ダッシュボード（会社全体スキルランキング参照） | ○ | ○ | ○ |
+| 管理者メニュー表示 | × | ○ | ○ |
+| ユーザ管理 | × | ○ | ○ |
+| 共有リンク管理 | × | ○ | ○ |
+| 任意ユーザの PDF 出力 | × | ○ | ○ |
+
+---
+
+## 9. 非機能要件（実装から読み取れる範囲）
+
+| 項目 | 内容 |
+|------|------|
+| セキュリティ | パスワードは bcrypt でハッシュ化（コスト係数 12）。招待トークンは SHA-256 ハッシュで保存。 |
+| セッション管理 | Cookie `ss_session` による JWT ベースのサーバーサイドセッション（有効期限 7日）。 |
+| マルチテナント | 全クエリに `companyId` を条件として付与し、テナント間のデータ混在を防ぐ。 |
+| 案件の所有者保護 | 案件の更新・削除は `skillSheet.userId` でログインユーザと一致することを検証。 |
+| PDF の機密表示 | 生成 PDF に「社外秘」ウォーターマークを自動付与。 |
+| レスポンシブ対応 | スキルピッカーはモバイル・デスクトップで異なるコンポーネントを使用。 |
+| 入力バリデーション | サーバーサイドは Zod でスキーマ検証。クライアントサイドも日付範囲などをチェック。 |
+| ルートガード | Next.js Middleware で `/projects`・`/pdf`・`/dashboard`・`/admin` を保護。未認証時は `/login` へリダイレクト。 |

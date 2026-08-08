@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="45">
+<rect x="2" y="4" width="36" height="36" rx="8" fill="#0ea5e9"/>
+<rect x="9" y="11" width="22" height="22" rx="4" fill="white"/>
+<circle cx="16" cy="24" r="3" fill="#0ea5e9"/>
+<rect x="20" y="22" width="12" height="3" fill="#0ea5e9"/>
+<rect x="20" y="27" width="8" height="3" fill="#7dd3fc"/>
+<text x="44" y="28"
+ font-size="20"
+ font-family="Noto Sans JP, Hiragino Kaku Gothic ProN, Yu Gothic, Meiryo, IPAexGothic, sans-serif"
+ fill="#111827">スキルシート</text>
+</svg>

@@ -1,0 +1,59 @@
+.markdown-body {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--bs-body-color, #212529);
+}
+
+.markdown-body h1 { font-size: 1.6rem; border-bottom: 2px solid #dee2e6; padding-bottom: 0.3rem; margin-bottom: 1rem; }
+.markdown-body h2 { font-size: 1.3rem; border-bottom: 1px solid #dee2e6; padding-bottom: 0.2rem; margin-top: 2rem; margin-bottom: 0.75rem; }
+.markdown-body h3 { font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+.markdown-body h4 { font-size: 1rem; margin-top: 1.2rem; margin-bottom: 0.4rem; font-weight: 600; }
+
+.markdown-body p  { margin-bottom: 0.6rem; }
+.markdown-body ul,
+.markdown-body ol { padding-left: 1.5rem; margin-bottom: 0.75rem; }
+.markdown-body li { margin-bottom: 0.2rem; }
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid #dee2e6;
+  padding: 0.4rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+.markdown-body thead tr { background-color: #f8f9fa; }
+.markdown-body tbody tr:nth-child(even) { background-color: #fafafa; }
+
+.markdown-body code {
+  background-color: #f3f4f6;
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.88em;
+  font-family: "SFMono-Regular", Consolas, monospace;
+}
+.markdown-body pre {
+  background-color: #f3f4f6;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+.markdown-body pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.87em;
+}
+
+.markdown-body hr { border: none; border-top: 1px solid #dee2e6; margin: 1.5rem 0; }
+.markdown-body blockquote {
+  border-left: 4px solid #dee2e6;
+  margin: 0 0 1rem;
+  padding: 0.25rem 1rem;
+  color: #6c757d;
+}
