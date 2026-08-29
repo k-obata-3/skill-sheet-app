@@ -83,7 +83,7 @@ export default function DashboardUI({
               </div>
 
               <div className="d-flex justify-content-end">
-                <AppButton outline={true} size="sm" href="/admin/shareLink" className="me-2">
+                <AppButton outline={true} size="sm" href="/admin/share-link" className="me-2">
                   共有リンク管理
                 </AppButton>
                 <AppButton outline={true} size="sm" href="/admin/users">

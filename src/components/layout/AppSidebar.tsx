@@ -55,18 +55,18 @@ export function AppSidebar({ isAdmin, open, onClose }: Props) {
                 onClick={() => onClose}
               />
               <SidebarItem
-                href="/admin/shareLink"
+                href="/admin/share-link"
                 icon={<></>}
                 label="共有リンク管理"
-                active={pathname.startsWith("/admin/shareLink")}
+                active={pathname.startsWith("/admin/share-link")}
                 onClick={() => onClose}
               />
               {process.env.NODE_ENV !== "production" && (
                 <SidebarItem
-                  href="/admin/registerCompany"
+                  href="/admin/register-company"
                   icon={<></>}
                   label="会社登録（開発用）"
-                  active={pathname.startsWith("/admin/registerCompany")}
+                  active={pathname.startsWith("/admin/register-company")}
                   onClick={() => onClose}
                   borderTop
                 />

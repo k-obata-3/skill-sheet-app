@@ -52,7 +52,7 @@ export default function ShareLinkAdminUI({ users, sharedLinks, baseUrl }: { user
       return;
     }
 
-    const res = await fetch(`/api/admin/shareLink`, {
+    const res = await fetch(`/api/admin/share-link`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -74,7 +74,7 @@ export default function ShareLinkAdminUI({ users, sharedLinks, baseUrl }: { user
   }
 
   async function deleteShareLink(id?: string) {
-    const res = await fetch(`/api/admin/shareLink`, {
+    const res = await fetch(`/api/admin/share-link`, {
       method: "DELETE",
       body: JSON.stringify({
         id: id,
