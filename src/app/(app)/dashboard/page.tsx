@@ -53,7 +53,6 @@ export default async function DashboardPage() {
 
   const myRanking = buildSkillRanking(projects.filter(p => p.skillSheet.userId === session.userId) ?? []);
   const companyRanking = buildSkillRanking(projects ?? []);
-console.log(myRanking)
   return (
     <PageComponent title="ダッシュボード">
       <DashboardUI

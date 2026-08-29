@@ -62,7 +62,7 @@ export default function UsersAdminUI({ users }: { users: UserRow[] }) {
                     )}
                     {!!u.skillSheet?._count.projects && (
                       <AppButton variant="secondary" outline={true} size="sm" as="a" href={`/pdf/skill-sheet/${u.id}`} target="_blank" className="me-2">
-                        PDF
+                        スキルシート
                       </AppButton>
                     )}
                     <AppButton size="sm" href={`/admin/users/${u.id}`}>

@@ -5,7 +5,7 @@ import { Role } from "@prisma/client";
 import { AppCard } from "@/components/ui/AppCard";
 import { AppButton } from "@/components/ui/AppButton";
 import { Alert, Col, Row } from "react-bootstrap";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Category, CATEGORY_LABEL } from "@/types/project";
 import { RankingResult, RankItem } from "@/lib/skill/skillSummary";
 import { AppModal } from "@/components/ui/AppModal";
@@ -33,14 +33,6 @@ export default function DashboardUI({
   const hasProject = Boolean(sheet?._count.projects);
   const [category, setCategory] = useState<Category>("languages");
   const [showLegendModal, setShowLegendModal] = useState<boolean>(false);
-
-  const maxMonths = useMemo(() => {
-    return Math.max(1, ...myRanking.byCategory[category].map((x: RankItem) => x.months));
-  }, [category, myRanking]);
-
-  const companyMaxMonths = useMemo(() => {
-    return Math.max(1, ...companyRanking.byCategory[category].map((x: RankItem) => x.months));
-  }, [category, companyRanking]);
 
   return (
     <div>
@@ -137,7 +129,6 @@ export default function DashboardUI({
                       key={item.name}
                       index={i}
                       item={item}
-                      maxMonths={maxMonths}
                       showContributors={false}
                     />
                   ))}
@@ -152,7 +143,6 @@ export default function DashboardUI({
                       key={item.name}
                       index={i}
                       item={item}
-                      maxMonths={companyMaxMonths}
                       showContributors={true}
                     />
                   ))}
@@ -189,15 +179,12 @@ export default function DashboardUI({
 function RankRow({
   item,
   index,
-  maxMonths,
   showContributors,
 }: {
   item: RankItem;
   index: number;
-  maxMonths: number;
   showContributors: boolean;
 }) {
-  // const pct = Math.max(0, Math.min(100, Math.round((item.months / maxMonths) * 100)));
   const pct = Math.max(0, Math.min(100, item.coverage * 100));
 
   return (

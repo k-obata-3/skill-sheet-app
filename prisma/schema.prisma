@@ -59,6 +59,8 @@ model SkillSheet {
   companyId      String
   userId         String         @unique
   skillSheetJson Json?
+  summary        String?
+  remarks        String?
   projects       SkillProject[]
 
   createdAt DateTime @default(now())

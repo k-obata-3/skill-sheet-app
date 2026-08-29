@@ -116,7 +116,7 @@ export function SkillSheetPdfDoc({
         {/* テーブルヘッダ */}
         <View style={styles.table}>
           <View style={styles.row}>
-            {[...Array(8)].map((v, i) => (
+            {[...Array(8)].map((_, i) => (
               <View
                 style={[
                   styles.headerCell,

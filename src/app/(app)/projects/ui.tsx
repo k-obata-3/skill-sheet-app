@@ -19,7 +19,7 @@ export default function ProjectListUI({ sheet }: { sheet: Sheet | null }) {
     <>
       <div className="d-flex align-items-center mb-3">
         <div className="ms-auto">
-          <AppButton size="sm" href="/projects/new">案件追加</AppButton>
+          <AppButton size="sm" href="/projects/new">案件登録</AppButton>
         </div>
       </div>
 

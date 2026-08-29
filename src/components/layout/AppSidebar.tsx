@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 
 type Props = {
   isAdmin: boolean;
@@ -12,10 +11,8 @@ type Props = {
 
 export function AppSidebar({ isAdmin, open, onClose }: Props) {
   const pathname = usePathname();
-  const [busy, setBusy] = useState(false);
 
   async function logout() {
-    setBusy(true);
     await fetch("/api/auth/logout", { method: "POST" });
     window.location.href = "/login";
   }
@@ -64,18 +61,17 @@ export function AppSidebar({ isAdmin, open, onClose }: Props) {
                 active={pathname.startsWith("/admin/shareLink")}
                 onClick={() => onClose}
               />
+              {process.env.NODE_ENV !== "production" && (
+                <SidebarItem
+                  href="/admin/registerCompany"
+                  icon={<></>}
+                  label="会社登録（開発用）"
+                  active={pathname.startsWith("/admin/registerCompany")}
+                  onClick={() => onClose}
+                  borderTop
+                />
+              )}
             </>
-          )}
-          
-          {process.env.NODE_ENV !== 'production' && (
-            <SidebarItem
-              href="/develop"
-              icon={<></>}
-              label="開発ページ"
-              active={pathname.startsWith("/develop")}
-              onClick={() => onClose}
-              borderTop
-            />
           )}
         </nav>
 

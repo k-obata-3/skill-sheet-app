@@ -36,7 +36,7 @@ export default function RegisterCompanyUI() {
         location.href = "/login";
       }, 500);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 
