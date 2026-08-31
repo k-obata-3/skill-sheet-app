@@ -17,7 +17,7 @@ IT エンジニアのスキルシートを会社単位で管理・出力・共�
 | 言語 | TypeScript |
 | DB | SQLite（Prisma 6） |
 | UI | React Bootstrap 5 |
-| 認証 | Cookie セッション（jose）+ bcrypt |
+| 認証 | Cookie セッション（jose）+ bcryptjs |
 | PDF | @react-pdf/renderer |
 | バリデーション | Zod |
 
@@ -171,7 +171,7 @@ IT エンジニアのスキルシートを会社単位で管理・出力・共�
 
 ---
 
-### 5.7 共有リンク管理（管理者）（`/admin/shareLink`）
+### 5.7 共有リンク管理（管理者）（`/admin/share-link`）
 
 #### 5.7.1 共有リンク作成
 - 対象ユーザ（案件が1件以上登録された有効ユーザ）を選択して共有リンクを発行する。
@@ -227,6 +227,10 @@ Company
 
 ### 主要フィールド
 
+**SkillSheet**
+- `summary`: サマリー（任意）
+- `remarks`: 備考（任意）
+
 **SkillProject**
 - `projectJson`: `{ description, role, phases[] }` を JSON で保存
 - `skillsJson`: `{ languages[], frameworks[], databases[], cloud[], tools[] }` を JSON で保存
@@ -256,8 +260,8 @@ Company
 | POST | `/api/admin/users` | ユーザ作成 | ADMIN以上 |
 | PATCH | `/api/admin/users/[id]` | ユーザ更新 | ADMIN以上 |
 | POST | `/api/admin/users/[id]/invite` | 招待リンク再発行 | ADMIN以上 |
-| POST / DELETE | `/api/admin/shareLink` | 共有リンク作成・削除 | ADMIN以上 |
-| POST | `/api/public/register-company` | 会社登録（開発用） | 不要 |
+| POST / DELETE | `/api/admin/share-link` | 共有リンク作成・削除 | ADMIN以上 |
+| POST | `/api/public/register-company` | 会社登録。エンドポイント自体は認証不要だが、呼び出し元の `/admin/register-company` ページは ADMIN以上のログイン必須・本番環境では非表示（404） | 不要 |
 | POST | `/api/public/invite/complete` | 招待完了（パスワード設定） | 不要 |
 | GET | `/share/[token]` | 共有リンク経由 PDF 参照 | 不要（公開） |
 | GET | `/pdf/skill-sheet/output` | 自分の PDF 出力 | 要認証 |
@@ -283,7 +287,7 @@ Company
 
 | 項目 | 内容 |
 |------|------|
-| セキュリティ | パスワードは bcrypt でハッシュ化（コスト係数 12）。招待トークンは SHA-256 ハッシュで保存。 |
+| セキュリティ | パスワードは bcryptjs でハッシュ化（コスト係数 12）。招待トークンは SHA-256 ハッシュで保存。 |
 | セッション管理 | Cookie `ss_session` による JWT ベースのサーバーサイドセッション（有効期限 7日）。 |
 | マルチテナント | 全クエリに `companyId` を条件として付与し、テナント間のデータ混在を防ぐ。 |
 | 案件の所有者保護 | 案件の更新・削除は `skillSheet.userId` でログインユーザと一致することを検証。 |
