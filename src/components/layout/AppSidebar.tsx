@@ -61,6 +61,13 @@ export function AppSidebar({ isAdmin, open, onClose }: Props) {
                 active={pathname.startsWith("/admin/share-link")}
                 onClick={() => onClose}
               />
+              <SidebarItem
+                href="/admin/skill-master"
+                icon={<></>}
+                label="マスタ管理"
+                active={pathname.startsWith("/admin/skill-master")}
+                onClick={() => onClose}
+              />
               {process.env.NODE_ENV !== "production" && (
                 <SidebarItem
                   href="/admin/register-company"

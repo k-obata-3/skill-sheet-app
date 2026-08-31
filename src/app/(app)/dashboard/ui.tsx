@@ -9,6 +9,7 @@ import { useState } from "react";
 import { Category, CATEGORY_LABEL } from "@/types/project";
 import { RankingResult, RankItem } from "@/lib/skill/skillSummary";
 import { AppModal } from "@/components/ui/AppModal";
+import { CategorySwitcher } from "@/components/ui/CategorySwitcher";
 
 type Props = {
   role: Role;
@@ -96,21 +97,11 @@ export default function DashboardUI({
       </Row>
 
       <AppCard className="shadow-sm mb-3" title="得意スキル" onclick={() => setShowLegendModal(true)}>
-        <div className="skill-summary-controls">
-          <div className="select-row">
-            {(Object.keys(CATEGORY_LABEL) as Category[]).map((cat) => (
-              <AppButton
-                key={cat}
-                outline={true}
-                size="sm"
-                className={cat === category ? "select-button active" : "select-button"}
-                onClick={() => setCategory(cat)}
-              >
-                {CATEGORY_LABEL[cat]}
-              </AppButton>
-            ))}
-          </div>
-        </div>
+        <CategorySwitcher
+          options={(Object.keys(CATEGORY_LABEL) as Category[]).map((cat) => ({ value: cat, label: CATEGORY_LABEL[cat] }))}
+          value={category}
+          onChange={setCategory}
+        />
 
         <div className="skill-summary-grid mt-3">
           <div>

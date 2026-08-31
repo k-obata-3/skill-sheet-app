@@ -133,9 +133,16 @@ IT エンジニアのスキルシートを会社単位で管理・出力・共�
 
 - 会社ごとにスキルマスタ（SkillMaster）を保持する。
 - カテゴリ：`LANGUAGE` / `FRAMEWORK` / `DATABASE` / `CLOUD` / `TOOL`
-- マスタに存在するスキルを案件登録時のピッカーに表示する。
-- `isActive` フラグで有効 / 無効を切り替えられる。
+- マスタに存在するスキルを案件登録時のピッカーに表示する（`isActive: true` のもののみ）。
 - ユーザが自由入力でスキルを追加できる（ピッカー内の入力フォームから）。
+
+#### 5.5.1 マスタ管理（管理者）（`/admin/skill-master`）
+- ADMIN以上がスキルマスタの登録・有効/無効切り替え・削除を行う（名前・カテゴリの編集機能はなし）。
+- カテゴリ切り替えボタン（ダッシュボードの得意スキルカードと共通の `CategorySwitcher` コンポーネント）でカテゴリごとに一覧表示する。
+- 登録項目：カテゴリ・スキル名。
+- 一覧の各行でトグルスイッチにより `isActive`（有効 / 無効）を切り替え可能。
+- 同一会社・同一カテゴリ内でスキル名は重複登録不可（`companyId + category + name` の一意制約）。
+- 削除は完全削除（論理削除ではない）。
 
 ---
 
@@ -261,6 +268,9 @@ Company
 | PATCH | `/api/admin/users/[id]` | ユーザ更新 | ADMIN以上 |
 | POST | `/api/admin/users/[id]/invite` | 招待リンク再発行 | ADMIN以上 |
 | POST / DELETE | `/api/admin/share-link` | 共有リンク作成・削除 | ADMIN以上 |
+| POST | `/api/admin/skill-master` | スキルマスタ作成 | ADMIN以上 |
+| PATCH | `/api/admin/skill-master/[id]` | スキルマスタの有効/無効切り替え（`isActive` のみ更新可） | ADMIN以上 |
+| DELETE | `/api/admin/skill-master/[id]` | スキルマスタ削除 | ADMIN以上 |
 | POST | `/api/public/register-company` | 会社登録。エンドポイント自体は認証不要だが、呼び出し元の `/admin/register-company` ページは ADMIN以上のログイン必須・本番環境では非表示（404） | 不要 |
 | POST | `/api/public/invite/complete` | 招待完了（パスワード設定） | 不要 |
 | GET | `/share/[token]` | 共有リンク経由 PDF 参照 | 不要（公開） |
@@ -279,6 +289,7 @@ Company
 | 管理者メニュー表示 | × | ○ | ○ |
 | ユーザ管理 | × | ○ | ○ |
 | 共有リンク管理 | × | ○ | ○ |
+| スキルマスタ管理 | × | ○ | ○ |
 | 任意ユーザの PDF 出力 | × | ○ | ○ |
 
 ---
