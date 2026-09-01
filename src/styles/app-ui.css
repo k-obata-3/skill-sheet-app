@@ -588,15 +588,6 @@ body {
 
 }
 
-.skill-mobile-item {
-  padding: 16px 14px;
-  border-bottom: 1px solid var(--gray-200);
-}
-
-.skill-mobile-item:active {
-  background: rgba(16,185,129,0.12);
-}
-
 /* =========================================================
    Layout
    ========================================================= */
