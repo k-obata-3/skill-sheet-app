@@ -7,6 +7,8 @@ import { AppButton } from "@/components/ui/AppButton";
 import { AppCard } from "@/components/ui/AppCard";
 import { AppInput } from "@/components/ui/AppInput";
 import { AppSelect } from "@/components/ui/AppSelect";
+import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
+import { useToast } from "@/components/ui/ToastProvider";
 
 type UserDetail = {
   id: string;
@@ -27,6 +29,7 @@ type UserDetail = {
 
 export default function UserDetailUI({ user }: { user: UserDetail }) {
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [name, setName] = useState(user.name);
   const [subName, setSubName] = useState(user.subName);
@@ -34,11 +37,9 @@ export default function UserDetailUI({ user }: { user: UserDetail }) {
   const [dateOfBirth, setDateOfBirth] = useState(user.dateOfBirth);
   const [isActive, setIsActive] = useState(user.isActive);
   const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function save() {
-    setMsg(null);
     setBusy(true);
     setError(null)
 
@@ -66,8 +67,8 @@ export default function UserDetailUI({ user }: { user: UserDetail }) {
       return;
     }
 
-    setMsg("更新しました");
-    router.refresh();
+    showToast("更新しました");
+    router.push("/admin/users");
   }
 
   return (
@@ -84,8 +85,7 @@ export default function UserDetailUI({ user }: { user: UserDetail }) {
         <Alert variant="warning">案件が登録されていません</Alert>
       )}
       <AppCard className="shadow-sm mb-3">
-        {msg && <Alert variant="success">{msg}</Alert>}
-        {error && <Alert variant="danger" style={{whiteSpace: "pre-wrap"}}>{error}</Alert>}
+        <AppErrorAlert message={error} />
 
         {!user.invited && (
           <Form.Group>

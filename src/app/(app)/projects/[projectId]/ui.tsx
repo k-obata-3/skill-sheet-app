@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Form, Row, Col, Alert, ListGroup, } from "react-bootstrap";
+import { Form, Row, Col, ListGroup, } from "react-bootstrap";
 import { SkillPicker } from "@/components/SkillPicker";
 import { AppButton } from "@/components/ui/AppButton";
 import { AppCard } from "@/components/ui/AppCard";
 import { AppInput } from "@/components/ui/AppInput";
 import { AppBadge } from "@/components/ui/AppBadge";
 import { AppSelect } from "@/components/ui/AppSelect";
+import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
+import { useToast } from "@/components/ui/ToastProvider";
 import { Category, Phase, ProjectJsonKey, ProjectFormData, CATEGORY_LABEL, PHASE_LABEL } from "@/types/project";
 import { AppMonthSelect } from "@/components/ui/AppMonthSelect";
 import { AppSelectItemModal } from "@/components/ui/AppSelectItemModal";
@@ -34,6 +36,7 @@ export default function ProjectEditUI({
   masters,
 }: Props) {
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [form, setForm] = useState<ProjectFormData>(initialProject);
   const [saving, setSaving] = useState(false);
@@ -96,6 +99,7 @@ export default function ProjectEditUI({
       return;
     }
 
+    showToast(isEdit ? "案件を更新しました" : "案件を登録しました");
     router.push("/projects");
   }
 
@@ -114,6 +118,7 @@ export default function ProjectEditUI({
       return;
     }
 
+    showToast("案件を削除しました");
     router.push("/projects");
   }
 
@@ -135,7 +140,7 @@ export default function ProjectEditUI({
 
       <div>
       {/* <AppCard className="shadow-sm"> */}
-        {error && <Alert variant="danger" style={{whiteSpace: "pre-wrap"}}>{error}</Alert>}
+        <AppErrorAlert message={error} />
 
         <Row>
           <Col xl={7}>

@@ -62,7 +62,7 @@ export async function PUT(req: Request) {
   const parsed = ProjectFormSchema.safeParse(body);
   if (!parsed.success || !parsed.data.id) {
     return NextResponse.json(
-      { message: "validation error", errors: parsed.success ? null : parsed.error.flatten() },
+      { message: "バリデーションエラー", errors: parsed.success ? null : parsed.error.flatten() },
       { status: 400 }
     );
   }

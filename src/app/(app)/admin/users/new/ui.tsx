@@ -1,16 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Form, Alert } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { useRouter } from "next/navigation";
 import { AppButton } from "@/components/ui/AppButton";
 import { AppCard } from "@/components/ui/AppCard";
 import { AppInput } from "@/components/ui/AppInput";
 import { AppSelect } from "@/components/ui/AppSelect";
+import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
 import { InviteUrlModal } from "@/components/InviteUrlModal";
+import { useToast } from "@/components/ui/ToastProvider";
 
 export default function UserCreateUI() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState<"MEMBER" | "ADMIN" | "OWNER">("MEMBER");
@@ -43,6 +46,7 @@ export default function UserCreateUI() {
 
     const data = await res.json();
     setInviteUserId(data.user.id);
+    showToast("ユーザーを登録しました");
   }
 
   return (
@@ -54,7 +58,7 @@ export default function UserCreateUI() {
       </div>
 
       <AppCard className="shadow-sm">
-        {error && <Alert variant="danger" style={{whiteSpace: "pre-wrap"}}>{error}</Alert>}
+        <AppErrorAlert message={error} />
 
         <Form onSubmit={submit}>
           <Form.Group className="mb-3">

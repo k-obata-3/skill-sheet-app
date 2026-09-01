@@ -6,6 +6,7 @@ import { AppModal } from "@/components/ui/AppModal";
 import { AppButton } from "@/components/ui/AppButton";
 import { InputGroup } from "react-bootstrap";
 import { BsCopy } from "react-icons/bs";
+import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
 
 type Props = {
   title: string;
@@ -21,23 +22,25 @@ export function InviteUrlModal({
   show,
 }: Props) {
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if(!inviteUrl && show) {
+    if(!inviteUrl && !error && show) {
       issueInvite(userId);
     }
   }, [show]);
 
   async function issueInvite(userId: string) {
     const res = await fetch(`/api/admin/users/${userId}/invite`, { method: "POST" });
-    const data = await res.json();
+    const data = await res.json().catch(() => null);
     if (!res.ok) {
       setInviteUrl(null);
-      onClose();
-      alert("招待リンク発行に失敗しました");
+      setError(data?.message ?? "招待リンク発行に失敗しました");
+      setOpen(true);
       return;
     }
+    setError(null);
     setInviteUrl(data.inviteUrl);
     setOpen(true);
   }
@@ -52,6 +55,7 @@ export function InviteUrlModal({
       show={open}
       onClose={() => {
         setInviteUrl(null);
+        setError(null);
         setOpen(false);
         onClose();
       }}
@@ -62,6 +66,7 @@ export function InviteUrlModal({
           size="sm"
           onClick={() => {
             setInviteUrl(null);
+            setError(null);
             setOpen(false);
             onClose();
           }}
@@ -71,17 +76,22 @@ export function InviteUrlModal({
       }
       fullscreen="none"
     >
-
-      <h6 className="mb-0">招待リンクを作成しました。</h6>
-      <p className="muted">このリンクをユーザに共有して、パスワードを設定してください。</p>
-      <InputGroup>
-        <AppInput
-          value={inviteUrl ?? ""}
-          readOnly
-        />
-          <AppButton variant="secondary" outline={true} onClick={() => copy(inviteUrl!)}><BsCopy/></AppButton>
-      </InputGroup >
-      <p className="muted text-end">※リンクの有効期間は3日間です。</p>
+      {error ? (
+        <AppErrorAlert message={error} />
+      ) : (
+        <>
+          <h6 className="mb-0">招待リンクを作成しました。</h6>
+          <p className="muted">このリンクをユーザに共有して、パスワードを設定してください。</p>
+          <InputGroup>
+            <AppInput
+              value={inviteUrl ?? ""}
+              readOnly
+            />
+              <AppButton variant="secondary" outline={true} onClick={() => copy(inviteUrl!)}><BsCopy/></AppButton>
+          </InputGroup >
+          <p className="muted text-end">※リンクの有効期間は3日間です。</p>
+        </>
+      )}
     </AppModal>
   );
 }

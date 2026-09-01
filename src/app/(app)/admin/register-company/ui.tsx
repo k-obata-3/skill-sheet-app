@@ -27,11 +27,11 @@ export default function RegisterCompanyUI() {
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        alert(data?.message ?? "登録失敗");
+        console.error("登録失敗", data);
         return;
       }
 
-      alert("登録完了");
+      console.log("登録完了", data);
       setTimeout(() => {
         location.href = "/login";
       }, 500);

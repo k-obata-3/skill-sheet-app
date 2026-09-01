@@ -11,6 +11,8 @@ import { AppInput } from "@/components/ui/AppInput";
 import { AppModal } from "@/components/ui/AppModal";
 import { AppSelect } from "@/components/ui/AppSelect";
 import { CategorySwitcher } from "@/components/ui/CategorySwitcher";
+import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
+import { useToast } from "@/components/ui/ToastProvider";
 import { SKILL_CATEGORY_LABEL, SKILL_CATEGORY_ORDER } from "@/lib/skill/skillCategoryLabel";
 
 type SkillMasterRow = {
@@ -27,10 +29,12 @@ type CreateForm = {
 
 export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: SkillMasterRow[] }) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [category, setCategory] = useState<SkillCategory>(SKILL_CATEGORY_ORDER[0]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState<CreateForm>({ category: SKILL_CATEGORY_ORDER[0], name: "" });
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const filtered = skillMasters
     .filter((row) => row.category === category)
@@ -38,6 +42,7 @@ export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: Ski
 
   function openCreateModal() {
     setForm({ category, name: "" });
+    setError(null);
     setShowModal(true);
   }
 
@@ -45,6 +50,7 @@ export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: Ski
     if (!form.name.trim()) {
       return;
     }
+    setError(null);
     setSaving(true);
 
     const res = await fetch(`/api/admin/skill-master`, {
@@ -57,15 +63,18 @@ export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: Ski
 
     if (!res.ok) {
       const j = await res.json().catch(() => null);
-      alert(j?.message ?? "作成に失敗しました");
+      setError(j?.message ?? "作成に失敗しました");
       return;
     }
 
     setShowModal(false);
+    showToast("スキルを登録しました");
     router.refresh();
   }
 
   async function toggleActive(row: SkillMasterRow) {
+    setError(null);
+
     const res = await fetch(`/api/admin/skill-master/${row.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -74,10 +83,11 @@ export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: Ski
 
     if (!res.ok) {
       const j = await res.json().catch(() => null);
-      alert(j?.message ?? "更新に失敗しました");
+      setError(j?.message ?? "更新に失敗しました");
       return;
     }
 
+    showToast("スキルを更新しました");
     router.refresh();
   }
 
@@ -85,15 +95,17 @@ export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: Ski
     if (!confirm("このスキルを削除しますか？")) {
       return;
     }
+    setError(null);
 
     const res = await fetch(`/api/admin/skill-master/${id}`, { method: "DELETE" });
 
     if (!res.ok) {
       const j = await res.json().catch(() => null);
-      alert(j?.message ?? "削除に失敗しました");
+      setError(j?.message ?? "削除に失敗しました");
       return;
     }
 
+    showToast("スキルを削除しました");
     router.refresh();
   }
 
@@ -104,6 +116,8 @@ export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: Ski
           <AppButton size="sm" onClick={openCreateModal}>新規作成</AppButton>
         </div>
       </div>
+
+      {!showModal && <AppErrorAlert message={error} />}
 
       <CategorySwitcher
         options={SKILL_CATEGORY_ORDER.map((cat) => ({ value: cat, label: SKILL_CATEGORY_LABEL[cat] }))}
@@ -156,6 +170,7 @@ export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: Ski
         fullscreen={"none"}
       >
         <Form action={submit}>
+          <AppErrorAlert message={error} />
           <Form.Group className="mb-3">
             <Form.Label>カテゴリ</Form.Label>
             <AppSelect

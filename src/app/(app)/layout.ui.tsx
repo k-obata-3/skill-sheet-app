@@ -2,6 +2,7 @@
 
 import { Role } from "@prisma/client";
 import { AppSidebar } from "@/components/layout/AppSidebar";
+import { ToastProvider } from "@/components/ui/ToastProvider";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
@@ -33,20 +34,22 @@ export default function AppLayoutUI({
   }, [open]);
 
   return (
-    <div className="app-layout">
-      {/* Header (mobile only) */}
-      <header className="app-header">
-        <div className="hamburger" onClick={() => setOpen(true)} aria-label="メニュー">
-          <span />
-          <span />
-          <span />
-        </div>
-        <img src="/skillsheet-logo.svg" alt="スキルシート管理" height={45} />
-      </header>
-      <AppSidebar open={open} onClose={() => setOpen(false)} isAdmin={isAdmin} />
-      <main className="app-main">
-        {children}
-      </main>
-    </div>
+    <ToastProvider>
+      <div className="app-layout">
+        {/* Header (mobile only) */}
+        <header className="app-header">
+          <div className="hamburger" onClick={() => setOpen(true)} aria-label="メニュー">
+            <span />
+            <span />
+            <span />
+          </div>
+          <img src="/skillsheet-logo.svg" alt="スキルシート管理" height={45} />
+        </header>
+        <AppSidebar open={open} onClose={() => setOpen(false)} isAdmin={isAdmin} />
+        <main className="app-main">
+          {children}
+        </main>
+      </div>
+    </ToastProvider>
   );
 }

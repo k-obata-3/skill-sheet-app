@@ -15,7 +15,7 @@ export async function PUT(req: Request) {
   const parsed = SummarySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { message: "validation error" },
+      { message: "バリデーションエラー" },
       { status: 400 }
     );
   }
