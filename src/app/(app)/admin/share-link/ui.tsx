@@ -11,6 +11,7 @@ import { AppModal } from "@/components/ui/AppModal";
 import { AppSelect } from "@/components/ui/AppSelect";
 import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
 import { useToast } from "@/components/ui/ToastProvider";
+import { useConfirm } from "@/components/ui/ConfirmProvider";
 import { toYYYYMMDD } from "@/lib/date/monthOptions";
 
 type UserRow = {
@@ -38,6 +39,7 @@ const EMPTY_FORM: ShareLinkForm = { userId: "", expiryDate: "", comment: "" };
 export default function ShareLinkAdminUI({ users, sharedLinks, baseUrl }: { users: UserRow[], sharedLinks: SharedLink[], baseUrl: string }) {
   const router = useRouter();
   const { showToast } = useToast();
+  const confirm = useConfirm();
   const [showCreateShareLinkModal, setShowCreateShareLinkModal] = useState<boolean>(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [shareLinkForm, setShareLinkForm] = useState<ShareLinkForm>(EMPTY_FORM);
@@ -81,6 +83,13 @@ export default function ShareLinkAdminUI({ users, sharedLinks, baseUrl }: { user
   }
 
   async function deleteShareLink(id?: string) {
+    const ok = await confirm({
+      title: "共有リンクの削除",
+      message: id ? "この共有リンクを削除しますか？" : "期限切れの共有リンクを削除しますか？",
+    });
+    if (!ok) {
+      return;
+    }
     setError(null);
 
     const res = await fetch(`/api/admin/share-link`, {

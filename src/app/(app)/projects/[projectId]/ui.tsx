@@ -11,6 +11,7 @@ import { AppBadge } from "@/components/ui/AppBadge";
 import { AppSelect } from "@/components/ui/AppSelect";
 import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
 import { useToast } from "@/components/ui/ToastProvider";
+import { useConfirm } from "@/components/ui/ConfirmProvider";
 import { Category, Phase, ProjectJsonKey, ProjectFormData, CATEGORY_LABEL, PHASE_LABEL } from "@/types/project";
 import { AppMonthSelect } from "@/components/ui/AppMonthSelect";
 import { AppSelectItemModal } from "@/components/ui/AppSelectItemModal";
@@ -37,6 +38,7 @@ export default function ProjectEditUI({
 }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
+  const confirm = useConfirm();
 
   const [form, setForm] = useState<ProjectFormData>(initialProject);
   const [saving, setSaving] = useState(false);
@@ -106,6 +108,10 @@ export default function ProjectEditUI({
 
   /* ===== 削除 ===== */
   async function deleteProject() {
+    const ok = await confirm({ title: "案件の削除", message: "この案件を削除しますか？" });
+    if (!ok) {
+      return;
+    }
     setError(null);
 
     const res = await fetch(`/api/projects/${form.id}`, {

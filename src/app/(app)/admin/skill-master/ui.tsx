@@ -13,6 +13,7 @@ import { AppSelect } from "@/components/ui/AppSelect";
 import { CategorySwitcher } from "@/components/ui/CategorySwitcher";
 import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
 import { useToast } from "@/components/ui/ToastProvider";
+import { useConfirm } from "@/components/ui/ConfirmProvider";
 import { SKILL_CATEGORY_LABEL, SKILL_CATEGORY_ORDER } from "@/lib/skill/skillCategoryLabel";
 
 type SkillMasterRow = {
@@ -30,6 +31,7 @@ type CreateForm = {
 export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: SkillMasterRow[] }) {
   const router = useRouter();
   const { showToast } = useToast();
+  const confirm = useConfirm();
   const [category, setCategory] = useState<SkillCategory>(SKILL_CATEGORY_ORDER[0]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState<CreateForm>({ category: SKILL_CATEGORY_ORDER[0], name: "" });
@@ -92,7 +94,8 @@ export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: Ski
   }
 
   async function remove(id: string) {
-    if (!confirm("このスキルを削除しますか？")) {
+    const ok = await confirm({ title: "スキルの削除", message: "このスキルを削除しますか？" });
+    if (!ok) {
       return;
     }
     setError(null);
