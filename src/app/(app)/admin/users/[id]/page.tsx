@@ -36,9 +36,11 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
     throw new Error("Not found");
   }
 
+  const { passwordHash, ...userForUI } = user;
+
   return (
     <PageComponent title="ユーザ編集">
-      <UserDetailUI user={{...user, invited: !user.passwordHash}} />
+      <UserDetailUI user={{...userForUI, invited: !user.passwordHash}} />
     </PageComponent>
   );
 }

@@ -7,8 +7,8 @@ import { AppButton } from "@/components/ui/AppButton";
 import { Form } from "react-bootstrap";
 
 export default function LoginUI() {
-  const [email, setEmail] = useState("owner@example.com");
-  const [password, setPassword] = useState("test1234");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 

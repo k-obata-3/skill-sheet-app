@@ -33,7 +33,7 @@ export default async function AdminUsersPage() {
 
   return (
     <PageComponent title="ユーザ管理">
-      <UsersAdminUI users={users.map(u => ({...u, invited: u.passwordHash == null }))} />
+      <UsersAdminUI users={users.map(({ passwordHash, ...u }) => ({ ...u, invited: passwordHash == null }))} />
     </PageComponent>
   );
 }

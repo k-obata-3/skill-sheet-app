@@ -10,6 +10,10 @@ type Body = {
 };
 
 export async function POST(req: Request) {
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ message: "Not Found" }, { status: 404 });
+  }
+
   try {
     const body = (await req.json()) as Body;
 
