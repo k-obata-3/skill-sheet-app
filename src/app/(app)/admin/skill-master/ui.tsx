@@ -14,6 +14,7 @@ import { CategorySwitcher } from "@/components/ui/CategorySwitcher";
 import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
 import { useToast } from "@/components/ui/ToastProvider";
 import { useConfirm } from "@/components/ui/ConfirmProvider";
+import { useApiRequest, HttpMethod } from "@/lib/hooks/useApiRequest";
 import { SKILL_CATEGORY_LABEL, SKILL_CATEGORY_ORDER } from "@/lib/skill/skillCategoryLabel";
 
 type SkillMasterRow = {
@@ -32,11 +33,10 @@ export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: Ski
   const router = useRouter();
   const { showToast } = useToast();
   const confirm = useConfirm();
+  const { request, loading: saving, error, setError } = useApiRequest();
   const [category, setCategory] = useState<SkillCategory>(SKILL_CATEGORY_ORDER[0]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState<CreateForm>({ category: SKILL_CATEGORY_ORDER[0], name: "" });
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const filtered = skillMasters
     .filter((row) => row.category === category)
@@ -52,20 +52,13 @@ export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: Ski
     if (!form.name.trim()) {
       return;
     }
-    setError(null);
-    setSaving(true);
 
-    const res = await fetch(`/api/admin/skill-master`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-
-    setSaving(false);
-
-    if (!res.ok) {
-      const j = await res.json().catch(() => null);
-      setError(j?.message ?? "作成に失敗しました");
+    const result = await request(
+      `/api/admin/skill-master`,
+      { method: HttpMethod.POST, json: form },
+      "作成に失敗しました"
+    );
+    if (!result.ok) {
       return;
     }
 
@@ -75,17 +68,12 @@ export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: Ski
   }
 
   async function toggleActive(row: SkillMasterRow) {
-    setError(null);
-
-    const res = await fetch(`/api/admin/skill-master/${row.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isActive: !row.isActive }),
-    });
-
-    if (!res.ok) {
-      const j = await res.json().catch(() => null);
-      setError(j?.message ?? "更新に失敗しました");
+    const result = await request(
+      `/api/admin/skill-master/${row.id}`,
+      { method: HttpMethod.PATCH, json: { isActive: !row.isActive } },
+      "更新に失敗しました"
+    );
+    if (!result.ok) {
       return;
     }
 
@@ -98,13 +86,9 @@ export default function SkillMasterAdminUI({ skillMasters }: { skillMasters: Ski
     if (!ok) {
       return;
     }
-    setError(null);
 
-    const res = await fetch(`/api/admin/skill-master/${id}`, { method: "DELETE" });
-
-    if (!res.ok) {
-      const j = await res.json().catch(() => null);
-      setError(j?.message ?? "削除に失敗しました");
+    const result = await request(`/api/admin/skill-master/${id}`, { method: HttpMethod.DELETE }, "削除に失敗しました");
+    if (!result.ok) {
       return;
     }
 

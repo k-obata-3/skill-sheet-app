@@ -8,6 +8,7 @@ import { AppInput } from "@/components/ui/AppInput";
 import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
 import { useToast } from "@/components/ui/ToastProvider";
 import { CategorySwitcher } from "@/components/ui/CategorySwitcher";
+import { useApiRequest, HttpMethod } from "@/lib/hooks/useApiRequest";
 
 type Project = {
   id: string;
@@ -35,28 +36,19 @@ export default function ProjectListUI({ sheet }: { sheet: Sheet | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showToast } = useToast();
+  const { request, loading: saving, error } = useApiRequest();
   const tabParam = searchParams.get("tab");
   const tab: TabKey = isTabKey(tabParam) ? tabParam : "summary";
   const [summary, setSummary] = useState(sheet?.summary ?? "");
   const [remarks, setRemarks] = useState(sheet?.remarks ?? "");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   async function saveSummary() {
-    setError(null);
-    setSaving(true);
-
-    const res = await fetch("/api/skill-sheet", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ summary, remarks }),
-    });
-
-    setSaving(false);
-
-    if (!res.ok) {
-      const j = await res.json().catch(() => null);
-      setError(j?.message ?? "保存に失敗しました");
+    const result = await request(
+      "/api/skill-sheet",
+      { method: HttpMethod.PUT, json: { summary, remarks } },
+      "保存に失敗しました"
+    );
+    if (!result.ok) {
       return;
     }
 

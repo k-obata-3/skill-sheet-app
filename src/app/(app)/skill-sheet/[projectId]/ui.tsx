@@ -16,6 +16,7 @@ import { Category, Phase, ProjectJsonKey, ProjectFormData, CATEGORY_LABEL, PHASE
 import { AppMonthSelect } from "@/components/ui/AppMonthSelect";
 import { AppSelectItemModal } from "@/components/ui/AppSelectItemModal";
 import { PROJECT_NAME_MAX_LENGTH, PROJECT_DESCRIPTION_MAX_LENGTH } from "@/lib/validation/project";
+import { useApiRequest, HttpMethod } from "@/lib/hooks/useApiRequest";
 
 export type SkillMasters = Record<Category, string[]>;
 
@@ -40,10 +41,9 @@ export default function ProjectEditUI({
   const router = useRouter();
   const { showToast } = useToast();
   const confirm = useConfirm();
+  const { request, loading: saving, error, setError } = useApiRequest();
 
   const [form, setForm] = useState<ProjectFormData>(initialProject);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   // 使用技術：編集中カテゴリ
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -84,21 +84,12 @@ export default function ProjectEditUI({
       return;
     }
 
-    setSaving(true);
-    const res = await fetch("/api/projects", {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    setSaving(false);
-
-    if (!res.ok) {
-      const j = await res.json().catch(() => null);
-      if(j?.message && j.errors?.fieldErrors) {
-        setError(`${j?.message}\n${Object.values(j.errors.fieldErrors).flat().join("\n")}`);
-      } else {
-        setError(j?.message ?? "保存に失敗しました");
-      }
+    const result = await request(
+      "/api/projects",
+      { method: isEdit ? HttpMethod.PUT : HttpMethod.POST, json: form },
+      "保存に失敗しました"
+    );
+    if (!result.ok) {
       return;
     }
 
@@ -113,15 +104,9 @@ export default function ProjectEditUI({
     if (!ok) {
       return;
     }
-    setError(null);
 
-    const res = await fetch(`/api/projects/${form.id}`, {
-      method: "DELETE",
-    });
-
-    if (!res.ok) {
-      const j = await res.json().catch(() => null);
-      setError(j?.message ?? "削除に失敗しました");
+    const result = await request(`/api/projects/${form.id}`, { method: HttpMethod.DELETE }, "削除に失敗しました");
+    if (!result.ok) {
       return;
     }
 

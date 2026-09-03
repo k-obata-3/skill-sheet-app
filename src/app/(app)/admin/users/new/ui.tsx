@@ -10,42 +10,30 @@ import { AppSelect } from "@/components/ui/AppSelect";
 import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
 import { InviteUrlModal } from "@/components/InviteUrlModal";
 import { useToast } from "@/components/ui/ToastProvider";
+import { useApiRequest, HttpMethod } from "@/lib/hooks/useApiRequest";
 
 export default function UserCreateUI() {
   const router = useRouter();
   const { showToast } = useToast();
+  const { request, loading: busy, error } = useApiRequest();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState<"MEMBER" | "ADMIN" | "OWNER">("MEMBER");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [inviteUserId, setInviteUserId] = useState<string | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setBusy(true);
 
-    const res = await fetch("/api/admin/users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name, role }),
-    });
-
-    setBusy(false);
-
-    if (!res.ok) {
-      const j = await res.json().catch(() => null);
-      if(j?.message && j.errors?.fieldErrors) {
-        setError(`${j?.message}\n${Object.values(j.errors.fieldErrors).flat().join("\n")}`);
-      } else {
-        setError(j?.message ?? "作成に失敗しました");
-      }
+    const result = await request(
+      "/api/admin/users",
+      { method: HttpMethod.POST, json: { email, name, role } },
+      "作成に失敗しました"
+    );
+    if (!result.ok) {
       return;
     }
 
-    const data = await res.json();
-    setInviteUserId(data.user.id);
+    setInviteUserId(result.data.user.id);
     showToast("ユーザーを登録しました");
   }
 

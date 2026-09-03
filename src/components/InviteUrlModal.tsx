@@ -7,6 +7,7 @@ import { AppButton } from "@/components/ui/AppButton";
 import { InputGroup } from "react-bootstrap";
 import { BsCopy } from "react-icons/bs";
 import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
+import { useApiRequest, HttpMethod } from "@/lib/hooks/useApiRequest";
 
 const MODE_CONFIG = {
   invite: {
@@ -43,8 +44,8 @@ export function InviteUrlModal({
   mode = "invite",
 }: Props) {
   const config = MODE_CONFIG[mode];
+  const { request, error, setError } = useApiRequest();
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -54,16 +55,13 @@ export function InviteUrlModal({
   }, [show]);
 
   async function issueInvite(userId: string) {
-    const res = await fetch(config.endpoint(userId), { method: "POST" });
-    const data = await res.json().catch(() => null);
-    if (!res.ok) {
+    const result = await request(config.endpoint(userId), { method: HttpMethod.POST }, config.errorMessage);
+    if (!result.ok) {
       setInviteUrl(null);
-      setError(data?.message ?? config.errorMessage);
       setOpen(true);
       return;
     }
-    setError(null);
-    setInviteUrl(data[config.urlField]);
+    setInviteUrl(result.data[config.urlField]);
     setOpen(true);
   }
 

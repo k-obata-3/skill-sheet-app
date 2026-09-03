@@ -10,6 +10,7 @@ import { AppSelect } from "@/components/ui/AppSelect";
 import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
 import { useToast } from "@/components/ui/ToastProvider";
 import { InviteUrlModal } from "@/components/InviteUrlModal";
+import { useApiRequest, HttpMethod } from "@/lib/hooks/useApiRequest";
 
 type UserDetail = {
   id: string;
@@ -31,41 +32,22 @@ type UserDetail = {
 export default function UserDetailUI({ user }: { user: UserDetail }) {
   const router = useRouter();
   const { showToast } = useToast();
+  const { request, loading: busy, error } = useApiRequest();
 
   const [name, setName] = useState(user.name);
   const [subName, setSubName] = useState(user.subName);
   const [role, setRole] = useState<UserDetail["role"]>(user.role);
   const [dateOfBirth, setDateOfBirth] = useState(user.dateOfBirth);
   const [isActive, setIsActive] = useState(user.isActive);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [showResetModal, setShowResetModal] = useState(false);
 
   async function save() {
-    setBusy(true);
-    setError(null)
-
-    const res = await fetch(`/api/admin/users/${user.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        subName,
-        role,
-        dateOfBirth,
-        isActive
-      }),
-    });
-
-    setBusy(false);
-
-    if (!res.ok) {
-      const j = await res.json().catch(() => null);
-      if(j?.message && j.errors?.fieldErrors) {
-        setError(`${j?.message}\n${Object.values(j.errors.fieldErrors).flat().join("\n")}`);
-      } else {
-        setError(j?.message ?? "更新に失敗しました");
-      }
+    const result = await request(
+      `/api/admin/users/${user.id}`,
+      { method: HttpMethod.PATCH, json: { name, subName, role, dateOfBirth, isActive } },
+      "更新に失敗しました"
+    );
+    if (!result.ok) {
       return;
     }
 

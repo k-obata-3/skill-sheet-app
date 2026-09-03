@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AppCard } from "@/components/ui/AppCard";
 import { AppInput } from "@/components/ui/AppInput";
 import { AppButton } from "@/components/ui/AppButton";
+import { useApiRequest, HttpMethod } from "@/lib/hooks/useApiRequest";
 
 export default function InviteSetPasswordUI({
   token,
@@ -14,44 +15,38 @@ export default function InviteSetPasswordUI({
   valid: boolean;
   user: { id: string; name: string; email: string } | null;
 }) {
+  const { request, loading, error, setError } = useApiRequest();
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [localMsg, setLocalMsg] = useState<string | null>(null);
+  const msg = localMsg ?? error;
 
   async function submit() {
-    setMsg(null);
+    setLocalMsg(null);
+    setError(null);
     if (!valid) return;
 
     if (password.length < 8) {
-      setMsg("パスワードは8文字以上にしてください。");
+      setLocalMsg("パスワードは8文字以上にしてください。");
       return;
     }
     if (password !== password2) {
-      setMsg("パスワードが一致しません。");
+      setLocalMsg("パスワードが一致しません。");
       return;
     }
 
-    setLoading(true);
-    try {
-      const res = await fetch("/api/public/invite/complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
-      });
-
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setMsg(data?.message ?? "設定に失敗しました。");
-        return;
-      }
-
-      setMsg("設定が完了しました。ログインしてください。");
-      // ログイン画面へ遷移
-      location.href = "/login";
-    } finally {
-      setLoading(false);
+    const result = await request(
+      "/api/public/invite/complete",
+      { method: HttpMethod.POST, json: { token, password } },
+      "設定に失敗しました。"
+    );
+    if (!result.ok) {
+      return;
     }
+
+    setLocalMsg("設定が完了しました。ログインしてください。");
+    // ログイン画面へ遷移
+    location.href = "/login";
   }
 
   return (

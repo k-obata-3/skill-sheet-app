@@ -4,30 +4,24 @@ import { useState } from "react";
 import { AppCard } from "@/components/ui/AppCard";
 import { AppInput } from "@/components/ui/AppInput";
 import { AppButton } from "@/components/ui/AppButton";
+import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
+import { useApiRequest, HttpMethod } from "@/lib/hooks/useApiRequest";
 import { Form } from "react-bootstrap";
 
 export default function LoginUI() {
+  const { request, loading, error } = useApiRequest();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [err, setErr] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setErr(null);
-    setLoading(true);
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
-
-    setLoading(false);
-
-    if (!res.ok) {
-      const j = await res.json().catch(() => null);
-      setErr(j?.message ?? "ログインに失敗しました");
+    const result = await request(
+      "/api/auth/login",
+      { method: HttpMethod.POST, json: { email, password } },
+      "ログインに失敗しました"
+    );
+    if (!result.ok) {
       return;
     }
 
@@ -41,7 +35,7 @@ export default function LoginUI() {
           <img src="/skillsheet-logo.svg" alt="スキルシート管理" height={80} />
         </div>
 
-        {err ? <div className="alert alert-danger">{err}</div> : null}
+        <AppErrorAlert message={error} />
 
         <Form onSubmit={onSubmit}>
           <Form.Group className="mb-3">

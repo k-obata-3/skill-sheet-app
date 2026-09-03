@@ -12,6 +12,7 @@ import { AppSelect } from "@/components/ui/AppSelect";
 import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
 import { useToast } from "@/components/ui/ToastProvider";
 import { useConfirm } from "@/components/ui/ConfirmProvider";
+import { useApiRequest, HttpMethod } from "@/lib/hooks/useApiRequest";
 import { toYYYYMMDD } from "@/lib/date/monthOptions";
 
 type UserRow = {
@@ -40,10 +41,10 @@ export default function ShareLinkAdminUI({ users, sharedLinks, baseUrl }: { user
   const router = useRouter();
   const { showToast } = useToast();
   const confirm = useConfirm();
+  const { request, error, setError } = useApiRequest();
   const [showCreateShareLinkModal, setShowCreateShareLinkModal] = useState<boolean>(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [shareLinkForm, setShareLinkForm] = useState<ShareLinkForm>(EMPTY_FORM);
-  const [error, setError] = useState<string | null>(null);
   const currentDate = new Date();
 
   useEffect(() => {
@@ -58,27 +59,26 @@ export default function ShareLinkAdminUI({ users, sharedLinks, baseUrl }: { user
     if(!shareLinkForm.userId) {
       return;
     }
-    setError(null);
 
-    const res = await fetch(`/api/admin/share-link`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: shareLinkForm.userId,
-        expiryDate: shareLinkForm.expiryDate,
-        comment: shareLinkForm.comment,
-      }),
-    });
+    const result = await request(
+      `/api/admin/share-link`,
+      {
+        method: HttpMethod.POST,
+        json: {
+          userId: shareLinkForm.userId,
+          expiryDate: shareLinkForm.expiryDate,
+          comment: shareLinkForm.comment,
+        },
+      },
+      "共有リンク作成に失敗しました"
+    );
 
-    if (!res.ok) {
-      const j = await res.json().catch(() => null);
-      setError(j?.message ?? "共有リンク作成に失敗しました");
+    if (!result.ok) {
       setShareUrl(null);
       return;
     }
 
-    const data = await res.json();
-    setShareUrl(data.shareLinkUrl);
+    setShareUrl(result.data.shareLinkUrl);
     showToast("共有リンクを登録しました");
   }
 
@@ -90,17 +90,13 @@ export default function ShareLinkAdminUI({ users, sharedLinks, baseUrl }: { user
     if (!ok) {
       return;
     }
-    setError(null);
 
-    const res = await fetch(`/api/admin/share-link`, {
-      method: "DELETE",
-      body: JSON.stringify({
-        id: id,
-      }),
-    });
-    if (!res.ok) {
-      const j = await res.json().catch(() => null);
-      setError(j?.message ?? "削除に失敗しました");
+    const result = await request(
+      `/api/admin/share-link`,
+      { method: HttpMethod.DELETE, json: { id } },
+      "削除に失敗しました"
+    );
+    if (!result.ok) {
       return;
     }
 
