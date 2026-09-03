@@ -46,26 +46,15 @@ export async function DELETE(req: Request) {
       }
     });
   } else {
-    const currentDate = new Date();
-    currentDate.setHours(currentDate.getHours() + 9);
+    // expiresAt は "YYYY-MM-DD" 文字列（辞書順=時系列順）で保存されているため、
+    // 今日の日付文字列との比較で期限切れ（今日より前の日付）を直接絞り込む
+    const todayStr = new Date().toISOString().slice(0, 10);
 
-    const sharedLinks = await prisma.sharedLinkUrl.findMany({
+    await prisma.sharedLinkUrl.deleteMany({
       where: {
-        companyId: companyId,
-      }
-    });
-
-    sharedLinks.forEach(async(row) => {
-      const [y, m, d] = row.expiresAt?.split("-") ?? [];
-      const expiresAt = row.expiresAt ? new Date(Number(y), Number(m) - 1, Number(d) + 1) : null;
-      expiresAt?.setHours(9, 0, 0, 0);
-      if(expiresAt && currentDate > expiresAt) {
-        await prisma.sharedLinkUrl.delete({
-          where: {
-            id: row.id,
-          }
-        });
-      }
+        companyId,
+        expiresAt: { not: null, lt: todayStr },
+      },
     });
   }
 

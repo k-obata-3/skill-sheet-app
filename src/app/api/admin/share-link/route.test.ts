@@ -50,38 +50,20 @@ describe("DELETE /api/admin/share-link", () => {
     expect(res.status).toBe(200);
   });
 
-  it("idを指定しない場合はcompanyId内の期限切れリンクを検索する", async () => {
+  it("idを指定しない場合はcompanyId内の期限切れリンクをdeleteManyで一括削除する（無期限は not:null で対象外）", async () => {
     vi.mocked(requireAdmin).mockResolvedValue(makeSession());
-    prismaMock.sharedLinkUrl.findMany.mockResolvedValue([]);
+    prismaMock.sharedLinkUrl.deleteMany.mockResolvedValue({ count: 3 });
 
     const res = await DELETE(jsonRequest("http://test", {}, { method: "DELETE" }));
 
-    expect(prismaMock.sharedLinkUrl.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { companyId: "company-1" } })
-    );
-    expect(res.status).toBe(200);
-  });
-
-  it("期限切れのリンクは実際に削除される", async () => {
-    vi.mocked(requireAdmin).mockResolvedValue(makeSession());
-    prismaMock.sharedLinkUrl.findMany.mockResolvedValue([
-      { id: "expired-1", expiresAt: "2000-01-01" },
-    ] as any);
-    prismaMock.sharedLinkUrl.delete.mockResolvedValue({} as any);
-
-    await DELETE(jsonRequest("http://test", {}, { method: "DELETE" }));
-
-    expect(prismaMock.sharedLinkUrl.delete).toHaveBeenCalledWith({ where: { id: "expired-1" } });
-  });
-
-  it("期限内のリンクは削除されない", async () => {
-    vi.mocked(requireAdmin).mockResolvedValue(makeSession());
-    prismaMock.sharedLinkUrl.findMany.mockResolvedValue([
-      { id: "future-1", expiresAt: "2999-01-01" },
-    ] as any);
-
-    await DELETE(jsonRequest("http://test", {}, { method: "DELETE" }));
-
+    expect(prismaMock.sharedLinkUrl.deleteMany).toHaveBeenCalledWith({
+      where: {
+        companyId: "company-1",
+        expiresAt: { not: null, lt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/) },
+      },
+    });
+    expect(prismaMock.sharedLinkUrl.findMany).not.toHaveBeenCalled();
     expect(prismaMock.sharedLinkUrl.delete).not.toHaveBeenCalled();
+    expect(res.status).toBe(200);
   });
 });
