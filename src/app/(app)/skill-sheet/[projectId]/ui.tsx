@@ -15,6 +15,7 @@ import { useConfirm } from "@/components/ui/ConfirmProvider";
 import { Category, Phase, ProjectJsonKey, ProjectFormData, CATEGORY_LABEL, PHASE_LABEL } from "@/types/project";
 import { AppMonthSelect } from "@/components/ui/AppMonthSelect";
 import { AppSelectItemModal } from "@/components/ui/AppSelectItemModal";
+import { PROJECT_NAME_MAX_LENGTH, PROJECT_DESCRIPTION_MAX_LENGTH } from "@/lib/validation/project";
 
 export type SkillMasters = Record<Category, string[]>;
 
@@ -102,7 +103,7 @@ export default function ProjectEditUI({
     }
 
     showToast(isEdit ? "案件を更新しました" : "案件を登録しました");
-    router.push("/projects");
+    router.push("/skill-sheet?tab=projects");
   }
 
 
@@ -125,7 +126,7 @@ export default function ProjectEditUI({
     }
 
     showToast("案件を削除しました");
-    router.push("/projects");
+    router.push("/skill-sheet?tab=projects");
   }
 
   return (
@@ -153,13 +154,17 @@ export default function ProjectEditUI({
             <AppCard className="shadow-sm mb-3" title="基本情報">
               {/* ===== 案件名 ===== */}
               <Form.Group className="mb-3">
-                <Form.Label>案件名</Form.Label>
+                <div className="d-flex justify-content-between">
+                  <Form.Label>案件名</Form.Label>
+                  <div className="text-muted small">{form.name.length} / {PROJECT_NAME_MAX_LENGTH}</div>
+                </div>
                 <AppInput
                   value={form.name}
                   onChange={(e) =>
                     setForm({ ...form, name: e.target.value })
                   }
                   placeholder="案件名"
+                  maxLength={PROJECT_NAME_MAX_LENGTH}
                 />
               </Form.Group>
 
@@ -232,7 +237,10 @@ export default function ProjectEditUI({
 
               {/* ===== 内容 ===== */}
               <Form.Group className="mb-4">
-                <Form.Label>内容</Form.Label>
+                <div className="d-flex justify-content-between">
+                  <Form.Label>内容</Form.Label>
+                  <div className="text-muted small">{form.projectJson.description.length} / {PROJECT_DESCRIPTION_MAX_LENGTH}</div>
+                </div>
                 <AppInput
                   as="textarea"
                   rows={4}
@@ -241,6 +249,7 @@ export default function ProjectEditUI({
                     setForm({ ...form, projectJson: addProjectJson("description", e.target.value) })
                   }
                   placeholder="内容"
+                  maxLength={PROJECT_DESCRIPTION_MAX_LENGTH}
                 />
               </Form.Group>
 

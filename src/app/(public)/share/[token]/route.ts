@@ -55,6 +55,8 @@ export async function GET(
       userName: sheet.user.subName ?? sheet.user.name,
       companyName: sheet.company.name,
       dateOfBirth: sheet.user.dateOfBirth,
+      summary: sheet.summary,
+      remarks: sheet.remarks,
       projects: sheet.projects.map((p) => ({
         name: p.name,
         periodFrom: p.periodFrom,

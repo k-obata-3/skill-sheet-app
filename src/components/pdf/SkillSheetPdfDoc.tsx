@@ -6,6 +6,8 @@ type Props = {
   userName: string;
   companyName: string;
   dateOfBirth: string | null;
+  summary?: string | null;
+  remarks?: string | null;
   projects: ProjectFormData[];
 };
 
@@ -79,12 +81,29 @@ const styles = StyleSheet.create({
     zIndex: 1,
     textAlign: "center",
   },
+  sectionBox: {
+    marginTop: 6,
+    marginBottom: 6,
+    padding: 6,
+    border: "1 solid #000",
+  },
+  sectionLabel: {
+    fontSize: 9,
+    fontWeight: "bold",
+    marginBottom: 2,
+  },
+  sectionText: {
+    fontSize: 9,
+    lineHeight: 1.4,
+  },
 });
 
 export function SkillSheetPdfDoc({
   userName,
   companyName,
   dateOfBirth,
+  summary,
+  remarks,
   projects,
 }: Props) {
   const tableHeaderLabels = [
@@ -211,6 +230,20 @@ export function SkillSheetPdfDoc({
             </View>
           ))}
         </View>
+        {/* 自己PR */}
+        {summary && (
+          <View style={styles.sectionBox}>
+            <Text style={styles.sectionLabel}>自己PR</Text>
+            <Text style={styles.sectionText}>{summary}</Text>
+          </View>
+        )}
+        {/* 備考 */}
+        {remarks && (
+          <View style={styles.sectionBox}>
+            <Text style={styles.sectionLabel}>備考</Text>
+            <Text style={styles.sectionText}>{remarks}</Text>
+          </View>
+        )}
       </Page>
     </Document>
   );

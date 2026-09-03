@@ -3,9 +3,12 @@ import { requireSession } from "@/lib/auth/require";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+const SUMMARY_MAX_LENGTH = 500;
+const REMARKS_MAX_LENGTH = 300;
+
 const SummarySchema = z.object({
-  summary: z.string().min(1),
-  remarks: z.string().optional(),
+  summary: z.string().min(1).max(SUMMARY_MAX_LENGTH, `自己PRは${SUMMARY_MAX_LENGTH}文字以内で入力してください`),
+  remarks: z.string().max(REMARKS_MAX_LENGTH, `備考は${REMARKS_MAX_LENGTH}文字以内で入力してください`).optional(),
 });
 
 export async function PUT(req: Request) {
@@ -15,7 +18,7 @@ export async function PUT(req: Request) {
   const parsed = SummarySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { message: "バリデーションエラー" },
+      { message: parsed.error.issues[0]?.message ?? "バリデーションエラー" },
       { status: 400 }
     );
   }

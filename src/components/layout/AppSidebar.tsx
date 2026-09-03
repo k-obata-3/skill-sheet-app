@@ -39,10 +39,10 @@ export function AppSidebar({ isAdmin, open, onClose }: Props) {
             onClick={() => onClose}
           />
           <SidebarItem
-            href="/projects"
+            href="/skill-sheet"
             icon={<></>}
-            label="案件一覧"
-            active={pathname.startsWith("/projects")}
+            label="スキルシート"
+            active={pathname.startsWith("/skill-sheet")}
             onClick={() => onClose}
           />
           {isAdmin && (

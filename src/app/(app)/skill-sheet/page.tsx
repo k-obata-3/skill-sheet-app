@@ -22,7 +22,7 @@ export default async function MySkillSheetPage() {
   });
 
   return (
-    <PageComponent title="案件一覧">
+    <PageComponent title="スキルシート">
       <ProjectListUI sheet={sheet} />
     </PageComponent>
   );
