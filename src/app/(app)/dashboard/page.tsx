@@ -21,8 +21,14 @@ export default async function DashboardPage() {
   });
 
   let userCount: number | undefined;
+  let shareLinkCount: number | undefined;
   if (session.role !== "MEMBER") {
     userCount = await prisma.user.count({
+      where: {
+        companyId: session.companyId
+      },
+    });
+    shareLinkCount = await prisma.sharedLinkUrl.count({
       where: {
         companyId: session.companyId
       },
@@ -59,6 +65,7 @@ export default async function DashboardPage() {
         role={session.role}
         sheet={sheet}
         userCount={userCount}
+        shareLinkCount={shareLinkCount}
         myRanking={myRanking}
         companyRanking={companyRanking}
       />

@@ -20,6 +20,7 @@ type Props = {
     }
   } | null;
   userCount?: number;
+  shareLinkCount?: number;
   myRanking: RankingResult;
   companyRanking: RankingResult;
 };
@@ -28,6 +29,7 @@ export default function DashboardUI({
   role,
   sheet,
   userCount,
+  shareLinkCount,
   myRanking,
   companyRanking,
 }: Props) {
@@ -54,47 +56,11 @@ export default function DashboardUI({
         </div>
 
       </Alert>
-      <Row>
-        <Col>
-          <AppCard className="shadow-sm mb-3" title="案件一覧">
-            <div className="d-flex align-items-center mb-2">
-              <div className="text-muted">
-                案件数
-              </div>
-              <div className="ms-auto fw-semibold">
-                {!!sheet?._count.projects ? sheet?._count.projects : "未登録"}
-              </div>
-            </div>
-            <div className="d-flex justify-content-end">
-              <AppButton size="sm" href={hasProject ? "/projects" : "/projects/new"}>{hasProject ? "編集" : "登録"}</AppButton>
-            </div>
-          </AppCard>
-        </Col>
-        {/* 管理者メニュー */}
-        {role !== "MEMBER" && (
-          <Col md={6}>
-            <AppCard className="shadow-sm mb-3" title="管理者メニュー">
-              <div className="d-flex align-items-center mb-2">
-                <div className="text-muted">
-                  登録ユーザ数
-                </div>
-                <div className="ms-auto fw-semibold">
-                  {userCount}
-                </div>
-              </div>
-
-              <div className="d-flex justify-content-end">
-                <AppButton outline={true} size="sm" href="/admin/share-link" className="me-2">
-                  共有リンク管理
-                </AppButton>
-                <AppButton outline={true} size="sm" href="/admin/users">
-                  ユーザ管理
-                </AppButton>
-              </div>
-            </AppCard>
-          </Col>
-        )}
-      </Row>
+      <div className="stat-tile-grid mb-3">
+        <StatTile label="案件" value={sheet?._count.projects ?? 0} />
+        {role !== "MEMBER" && <StatTile label="ユーザ" value={userCount ?? 0} />}
+        {role !== "MEMBER" && <StatTile label="共有リンク" value={shareLinkCount ?? 0} />}
+      </div>
 
       <AppCard className="shadow-sm mb-3" title="得意スキル" onclick={() => setShowLegendModal(true)}>
         <CategorySwitcher
@@ -166,6 +132,21 @@ export default function DashboardUI({
   );
 }
 
+
+function StatTile({
+  label,
+  value,
+}: {
+  label: string;
+  value: number | string;
+}) {
+  return (
+    <div className="stat-tile">
+      <div className="stat-tile-label">{label}</div>
+      <div className="stat-tile-value">{value}</div>
+    </div>
+  );
+}
 
 function RankRow({
   item,
