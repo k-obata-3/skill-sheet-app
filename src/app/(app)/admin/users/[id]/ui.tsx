@@ -9,6 +9,7 @@ import { AppInput } from "@/components/ui/AppInput";
 import { AppSelect } from "@/components/ui/AppSelect";
 import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
 import { useToast } from "@/components/ui/ToastProvider";
+import { InviteUrlModal } from "@/components/InviteUrlModal";
 
 type UserDetail = {
   id: string;
@@ -38,6 +39,7 @@ export default function UserDetailUI({ user }: { user: UserDetail }) {
   const [isActive, setIsActive] = useState(user.isActive);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   async function save() {
     setBusy(true);
@@ -75,11 +77,24 @@ export default function UserDetailUI({ user }: { user: UserDetail }) {
     <div>
       <div className="d-flex align-items-center mb-3">
         <div className="ms-auto d-flex">
+          {!user.invited && (
+            <AppButton variant="secondary" outline={true} size="sm" onClick={() => setShowResetModal(true)} className="me-2">
+              パスワード再設定リンク発行
+            </AppButton>
+          )}
           <AppButton variant="secondary" outline={true} size="sm" onClick={() => router.push("/admin/users")}>
             キャンセル
           </AppButton>
         </div>
       </div>
+
+      <InviteUrlModal
+        title="パスワード再設定"
+        userId={user.id}
+        mode="reset"
+        show={showResetModal}
+        onClose={() => setShowResetModal(false)}
+      />
 
       {!user.skillSheet?._count.projects && user.isActive && (
         <Alert variant="warning">案件が登録されていません</Alert>

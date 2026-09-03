@@ -8,11 +8,31 @@ import { InputGroup } from "react-bootstrap";
 import { BsCopy } from "react-icons/bs";
 import { AppErrorAlert } from "@/components/ui/AppErrorAlert";
 
+const MODE_CONFIG = {
+  invite: {
+    endpoint: (userId: string) => `/api/admin/users/${userId}/invite`,
+    urlField: "inviteUrl",
+    heading: "招待リンクを作成しました。",
+    description: "このリンクをユーザに共有して、パスワードを設定してください。",
+    validity: "※リンクの有効期間は3日間です。",
+    errorMessage: "招待リンク発行に失敗しました",
+  },
+  reset: {
+    endpoint: (userId: string) => `/api/admin/users/${userId}/reset-password`,
+    urlField: "resetUrl",
+    heading: "パスワード再設定リンクを作成しました。",
+    description: "このリンクをユーザに共有して、パスワードを再設定してください。",
+    validity: "※リンクの有効期間は3時間です。",
+    errorMessage: "パスワード再設定リンクの発行に失敗しました",
+  },
+} as const;
+
 type Props = {
   title: string;
   userId: string;
   onClose: () => void;
   show: boolean;
+  mode?: keyof typeof MODE_CONFIG;
 };
 
 export function InviteUrlModal({
@@ -20,7 +40,9 @@ export function InviteUrlModal({
   userId,
   onClose,
   show,
+  mode = "invite",
 }: Props) {
+  const config = MODE_CONFIG[mode];
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -32,16 +54,16 @@ export function InviteUrlModal({
   }, [show]);
 
   async function issueInvite(userId: string) {
-    const res = await fetch(`/api/admin/users/${userId}/invite`, { method: "POST" });
+    const res = await fetch(config.endpoint(userId), { method: "POST" });
     const data = await res.json().catch(() => null);
     if (!res.ok) {
       setInviteUrl(null);
-      setError(data?.message ?? "招待リンク発行に失敗しました");
+      setError(data?.message ?? config.errorMessage);
       setOpen(true);
       return;
     }
     setError(null);
-    setInviteUrl(data.inviteUrl);
+    setInviteUrl(data[config.urlField]);
     setOpen(true);
   }
 
@@ -80,8 +102,8 @@ export function InviteUrlModal({
         <AppErrorAlert message={error} />
       ) : (
         <>
-          <h6 className="mb-0">招待リンクを作成しました。</h6>
-          <p className="muted">このリンクをユーザに共有して、パスワードを設定してください。</p>
+          <h6 className="mb-0">{config.heading}</h6>
+          <p className="muted">{config.description}</p>
           <InputGroup>
             <AppInput
               value={inviteUrl ?? ""}
@@ -89,7 +111,7 @@ export function InviteUrlModal({
             />
               <AppButton variant="secondary" outline={true} onClick={() => copy(inviteUrl!)}><BsCopy/></AppButton>
           </InputGroup >
-          <p className="muted text-end">※リンクの有効期間は3日間です。</p>
+          <p className="muted text-end">{config.validity}</p>
         </>
       )}
     </AppModal>
